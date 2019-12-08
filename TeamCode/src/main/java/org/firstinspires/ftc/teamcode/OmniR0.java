@@ -128,7 +128,7 @@ public class OmniR0 extends LinearOpMode {
     distN = ( distN + senseDistN.getDistance(DistanceUnit.CM) ) / 2;
     distX = ( distX + senseDistX.getDistance(DistanceUnit.CM) ) / 2;
     distS = ( distS + senseDistS.getDistance(DistanceUnit.CM) ) / 2;
-    lumin = ( lumin + senseColor.red()+senseColor.green()+senseColor.blue() ) / 2
+    lumin = ( lumin + senseColor.red()+senseColor.green()+senseColor.blue() ) / 2;
 
     telemetry.addData("distN", distN);
     telemetry.addData("distX", distX);
