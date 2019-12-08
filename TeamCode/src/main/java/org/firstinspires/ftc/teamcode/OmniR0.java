@@ -31,15 +31,15 @@ public class OmniR0 extends LinearOpMode {
   private DcMotor         slider  = null;
   private Servo           grabber = null;
 
-  private ColorSensor     senseColor   = null;
+  private ColorSensor     color   = null;
 
   private DistanceSensor  senseDistN   = null;
-  private DistanceSensor  senseDistX   = null;
+  private DistanceSensor  sensedistS   = null;
   private DistanceSensor  senseDistS   = null;
 
-  double distN = 30;
-  double distX = 0;
-  double distS = 100;
+  double distN[] = {30, 30, 30, 30 };
+  double distS[] = {0,  0,  0,  0  };
+  double distS[] = {100,100,100,100};
 
   static double DIST_WALL                 = 5;
   static double DIST_Y_SKYBRIDGE          = 60;
@@ -52,13 +52,13 @@ public class OmniR0 extends LinearOpMode {
   static int optLuminG =  0;
   static int optDistNL = -1;
   static int optDistNG =  1;
-  static int optDistXL = -2;
-  static int optDistXG =  2;
+  static int optdistSL = -2;
+  static int optdistSG =  2;
   static int optDistSL = -3;
   static int optDistSG =  3;
   static int optTimeL  = -4;
 
-  double lumin = 1;
+  double lumin[] = {1,1,1,1};
   static double LUMIN_THRESHOLD = 0.3;
 
   boolean shouldGrab = false;
@@ -123,14 +123,31 @@ public class OmniR0 extends LinearOpMode {
   private void update(){
 
     grab();
-    distN = ( distN + senseDistN.getDistance(DistanceUnit.CM) ) / 2;
-    distX = ( distX + senseDistX.getDistance(DistanceUnit.CM) ) / 2;
-    distS = ( distS + senseDistS.getDistance(DistanceUnit.CM) ) / 2;
-    lumin = ( lumin + (senseColor.red()+senseColor.green()+senseColor.blue())/765 ) / 2;
-    telemetry.addData("lumin", lumin);
-    telemetry.addData("distN", distN);
-    telemetry.addData("distX", distX);
-    telemetry.addData("distS", distS);
+
+    distN[1] = distN[2];
+    distN[2] = distN[3];
+    distN[3] = senseDistN.getDistance(DistanceUnit.CM);
+    distN[0] = ( distN[1] + distN[2] + distN[3] ) / 3;
+
+    distS[1] = distS[2];
+    distS[2] = distS[3];
+    distS[3] = sensedistS.getDistance(DistanceUnit.CM);
+    distS[0] = ( distS[1] + distS[2] + distS[3] ) / 3;
+
+    distS[1] = distS[2];
+    distS[2] = distS[3];
+    distS[3] = sensedistS.getDistance(DistanceUnit.CM);
+    distS[0] = ( distS[1] + distS[2] + distS[3] ) / 3;
+
+    lumin[1] = lumin[2];
+    lumin[2] = lumin[3];
+    lumin[3] = senseColor.red()+senseColor.green()+senseColor.blue();
+    lumin[0] = ( lumin[1] + lumin[2] + lumin[3] ) / 3;
+
+    telemetry.addData("lumin", lumin[0]);
+    telemetry.addData("distN", distN[0]);
+    telemetry.addData("distS", distS[0]);
+    telemetry.addData("distS", distS[0]);
     telemetry.update();
 
   }
@@ -140,44 +157,44 @@ public class OmniR0 extends LinearOpMode {
     switch(option){
 
       case 0:
-        while(opModeIsActive() && lumin > comparator){
+        while(opModeIsActive() && lumin[0] > comparator){
           update();
         }
       break;
 
       case -1:
-        while(opModeIsActive() && distN < comparator){
+        while(opModeIsActive() && distN[0] < comparator){
           update();
         }
       break;
 
       case 1:
-        while(opModeIsActive() && distN > comparator){
+        while(opModeIsActive() && distN[0] > comparator){
           update();
         }
       break;
 
       case -2:
-        while(opModeIsActive() && distX < comparator){
+        while(opModeIsActive() && distS[0] < comparator){
           update();
         }
       break;
 
       case 2:
-        while(opModeIsActive() && distX > comparator){
+        while(opModeIsActive() && distS[0] > comparator){
           update();
         }
       break;
 
 
       case -3:
-        while(opModeIsActive() && distS < comparator){
+        while(opModeIsActive() && distS[0] < comparator){
           update();
         }
       break;
 
       case 3:
-        while(opModeIsActive() && distS > comparator){
+        while(opModeIsActive() && distS[0] > comparator){
           update();
         }
       break;
@@ -210,7 +227,7 @@ public class OmniR0 extends LinearOpMode {
     grabber    = hardwareMap.get( Servo.class  ,       "grabber" );
     senseColor = hardwareMap.get(ColorSensor.class,    "color"   );
     senseDistN = hardwareMap.get(DistanceSensor.class, "distN"   );
-    senseDistX = hardwareMap.get(DistanceSensor.class, "distX"   );
+    sensedistS = hardwareMap.get(DistanceSensor.class, "distS"   );
     senseDistS = hardwareMap.get(DistanceSensor.class, "distS"   );
 
     waitForStart();
@@ -227,7 +244,7 @@ public class OmniR0 extends LinearOpMode {
 
     //drive sideways to stone depot
     driveX(0.5);
-    runWhile(optDistXL, DIST_X_DEPOT_CENTER);
+    runWhile(optdistSL, DIST_X_DEPOT_CENTER);
 
     //drive forward for .2s
     driveY(0.5);
@@ -241,7 +258,7 @@ public class OmniR0 extends LinearOpMode {
 
     //drive sideways to inner track
     driveX(-0.5);
-    runWhile(optDistXG, DIST_X_INTRACK_OUTER);
+    runWhile(optdistSG, DIST_X_INTRACK_OUTER);
 
     //drive back until centered on foundation's long side
     driveY(-0.5);
@@ -254,7 +271,7 @@ public class OmniR0 extends LinearOpMode {
 
     //drive sideways until touching wall
     driveX(-0.5);
-    runWhile(optDistXG, DIST_WALL);
+    runWhile(optdistSG, DIST_WALL);
     driveX(0);
 
     //release foundation grabber
@@ -266,7 +283,7 @@ public class OmniR0 extends LinearOpMode {
 
     //drive sideways until centered on foundation's short side
     driveX(0.5);
-    runWhile(optDistXL, DIST_X_FOUNDATION_CENTER);
+    runWhile(optdistSL, DIST_X_FOUNDATION_CENTER);
 
     //spin 180deg
     driveSpn(1);
@@ -301,7 +318,7 @@ public class OmniR0 extends LinearOpMode {
     //drive sideways to inner track
 
     driveX(-0.5);
-    runWhile(optDistXG, DIST_X_INTRACK_OUTER);
+    runWhile(optdistSG, DIST_X_INTRACK_OUTER);
 
     //drive forward to under bridge
 
