@@ -41,13 +41,21 @@ public class OmniR0 extends LinearOpMode {
   double distN = 30;
   double distX = 0;
   double distS = 100;
-  double distNCache = 0;
+
+  double DIST_WALL                 = 5;
+  double DIST_Y_SKYBRIDGE          = 60;
+  double DIST_X_INTRACK_OUTER      = 25;
+  double DIST_X_DEPOT_CENTER       = 40;
+  double DIST_X_FOUNDATION_CENTER  = 35;
+  double DIST_Y_FOUNDATION_CENTER  = 15;
+  double DIST_Y_FOUNDATION_OUTER   = 40;
+
+  double sliderPos = 0;
+  double sliderPosCache = 0;
 
   double lumin = 1;
 
-  double timeCache = 0;
-
-  boolean isGrabbing = false;
+  boolean shouldGrab = false;
 
   private void driveX(double force){
 
@@ -90,7 +98,13 @@ public class OmniR0 extends LinearOpMode {
 
   }
 
-  private void grab(boolean shouldGrab){
+  private void sliderSpn(double force){
+
+    slider.setPower(force);
+
+  }
+
+  private void grab(){
 
     if(shouldGrab){
       grabber.setPosition(0.7);
@@ -100,11 +114,25 @@ public class OmniR0 extends LinearOpMode {
 
   }
 
-  private void senseUpdate(){
-    distN = ( distN + senseDistN.getDistance(DistanceUnit.CM) ) / 2;
-    distX = ( distX + senseDistX.getDistance(DistanceUnit.CM) ) / 2;
-    distS = ( distS + senseDistS.getDistance(DistanceUnit.CM) ) / 2;
-    lumin = ( lumin + (senseColor.red()+senseColor.green()+senseColor.blue()) / 3 ) / 2;
+  private void runWhile(boolean conditions){
+
+    while(opModeIsActive && conditions){
+
+      grab();
+      distN = ( distN + senseDistN.getDistance(DistanceUnit.CM) ) / 2;
+      distX = ( distX + senseDistX.getDistance(DistanceUnit.CM) ) / 2;
+      distS = ( distS + senseDistS.getDistance(DistanceUnit.CM) ) / 2;
+      lumin = ( lumin + (senseColor.red()+senseColor.green()+senseColor.blue()) / 3 ) / 2;
+
+    }
+
+  }
+
+  private void runFor(double duration){
+
+    runtime.reset();
+    runWhile(runtime > duration);
+
   }
 
   @Override
@@ -124,100 +152,99 @@ public class OmniR0 extends LinearOpMode {
     waitForStart();
     runtime.reset();
 
-
-    while(
-
-      opModeIsActive() &&
-      distN > 5 &&
-      lumin < 0.3
-
-    ){
-
-      driveY(0.5);
-      grab(false);
-
-      senseUpdate();
-
-    }
+    runWhile();
 
 
-    distNCache = distN;
-
-    while(
-
-      opModeIsActive() &&
-      distN - distNCache < 5
-
-    ){
-
-      driveY(-0.5);
-      grab(false);
-
-      senseUpdate();
-
-    }
+    driveY(0.5);
+    runWhile(distN > 5 && lumin < 0.3);
 
 
-    while(
+    //drive back for .2s
+    driveY(-0.5);
+    runFor(200);
 
-      opModeIsActive() &&
-      distX < 50
+    //drive sideways to stone depot
+    driveX(0.5);
+    runWhile(distX < DIST_X_DEPOT_CENTER);
 
-    ){
+    //drive forward for .2s
+    driveY(0.5);
+    runFor(200);
+    driveY(0);
 
-      driveX(0.5);
-      grab(false);
+    //grab
+    shouldGrab = true;
+    //wait 1s for grabber to close
+    runFor(1000);
 
-      senseUpdate();
+    //drive sideways to inner track
+    driveX(-0.5);
+    runWhile(distX > DIST_X_INTRACK_OUTER);
 
-    }
-
-
-    while(
-
-      opModeIsActive() &&
-      distN - distNCache > 2
-
-    ){
-
-      driveY(0.5);
-
-      senseUpdate();
-
-    }
-
-
-    grab(true);
-    sleep(1000);
+    //drive back until centered on foundation's long side
+    driveY(-0.5);
+    runWhile(distS > DIST_Y_FOUNDATION_CENTER);
+    driveY(0);
 
 
-    while(
+    //deploy foundation grabber
+    //
 
-      opModeIsActive() &&
-      distX > 50
+    //drive sideways until touching wall
+    driveX(-0.5);
+    runWhile(distX > DIST_WALL);
+    driveX(0);
 
-    ){
+    //release foundation grabber
+    //
 
-      driveX(-0.5);
+    //drive forward until clear of foundation
+    driveY(0.5);
+    runWhile(distS < DIST_Y_FOUNDATION_OUTER);
 
-      senseUpdate();
+    //drive sideways until centered on foundation's short side
+    driveX(0.5);
+    runWhile(distX < DIST_X_FOUNDATION_CENTER);
 
-    }
+    //spin 180deg
+    driveSpn(1);
+    runFor(500);
+
+    //raise slider
+    sliderSpn(1);
+    runFor(200);
+    sliderSpn(0);
+    driveSpn(0);
+
+    //drive "forward" until touching foundation's short side
+    driveY(0.5);
+    runFor(500);
+
+    //release
+    shouldGrab = false;
+
+    //drive "backward"
+    driveY(-0.5);
+    runFor(500);
+
+    shouldGrab = true;
+    sliderSpn(-1);
+    driveSpn(-1);
+    runFor(200);
+    sliderSpn(0);
+    runFor(500);
+    driveSpn(0);
 
 
-    while(
+    //drive sideways to inner track
 
-      opModeIsActive() &&
-      distS > 100
+    driveX(-0.5);
+    runWhile(distX > DIST_X_INTRACK_OUTER);
 
-    ){
+    //drive forward to under bridge
 
-      driveY(-0.5);
-
-      senseUpdate();
-
-    }
-
+    driveY(0.5);
+    runWhile(distN > DIST_Y_SKYBRIDGE && distS > DIST_Y_SKYBRIDGE);
 
     driveX(0);
 
