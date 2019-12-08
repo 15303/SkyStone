@@ -34,11 +34,11 @@ public class OmniR0 extends LinearOpMode {
   private ColorSensor     color   = null;
 
   private DistanceSensor  senseDistN   = null;
-  private DistanceSensor  sensedistS   = null;
+  private DistanceSensor  sensedistX   = null;
   private DistanceSensor  senseDistS   = null;
 
   double distN[] = {30,    30, 30, 30, 30, 30, 30, 30, 30 };
-  double distS[] = {0,     0,  0,  0,  0,  0,  0,  0,  0  };
+  double distX[] = {0,     0,  0,  0,  0,  0,  0,  0,  0  };
   double distS[] = {100,   100,100,100,100,100,100,100,100};
 
   static double DIST_WALL                 = 5;
@@ -53,8 +53,8 @@ public class OmniR0 extends LinearOpMode {
   static int optLuminG =  0;
   static int optDistNL = -1;
   static int optDistNG =  1;
-  static int optdistSL = -2;
-  static int optdistSG =  2;
+  static int optdistXL = -2;
+  static int optdistXG =  2;
   static int optDistSL = -3;
   static int optDistSG =  3;
   static int optTimeL  = -4;
