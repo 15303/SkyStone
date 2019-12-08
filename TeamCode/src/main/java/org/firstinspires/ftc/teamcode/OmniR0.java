@@ -131,6 +131,7 @@ public class OmniR0 extends LinearOpMode {
     telemetry.addData("distN", distN);
     telemetry.addData("distX", distX);
     telemetry.addData("distS", distS);
+    
     telemetry.update();
 
   }
