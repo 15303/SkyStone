@@ -53,8 +53,8 @@ public class OmniR0 extends LinearOpMode {
   static int optLuminG =  0;
   static int optDistNL = -1;
   static int optDistNG =  1;
-  static int optdistXL = -2;
-  static int optdistXG =  2;
+  static int optDistXL = -2;
+  static int optDistXG =  2;
   static int optDistSL = -3;
   static int optDistSG =  3;
   static int optTimeL  = -4;
@@ -126,20 +126,9 @@ public class OmniR0 extends LinearOpMode {
     grab();
 
     distN[0] = 0;
-
-    for(int i = 1; i < 7; i++){
-      distN[i] = distN[i+1];
-      distN[0]+= distN[i];
-
-      distX[i] = distX[i+1];
-      distX[0]+= distX[i];
-
-      distS[i] = distS[i+1];
-      distS[0]+= distS[i];
-
-      lumin[i] = lumin[i+1];
-      lumin[0]+= lumin[i];
-    }
+    distX[0] = 0;
+    distS[0] = 0;
+    lumin[0] = 0;
 
     distN[8] = senseDistN.getDistance(DistanceUnit.CM);
     distN[0]+= distN[8];
