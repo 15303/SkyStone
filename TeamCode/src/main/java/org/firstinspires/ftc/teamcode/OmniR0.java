@@ -40,15 +40,26 @@ public class OmniR0 extends LinearOpMode {
   double distN = 30;
   double distX = 0;
   double distS = 100;
+  double lumin = 100;
+  double time = 0;
+
 
   static double DIST_WALL                 = 5;
+
   static double DIST_Y_SKYBRIDGE          = 60;
+
   static double DIST_X_INTRACK_OUTER      = 25;
-  static double DIST_X_DEPOT_CENTER       = 40;
-  static double DIST_X_DEPOT_OUTER        = 20;
+
+  static double DIST_X_DEPOT_CENTER       = 45;
+  static double DIST_X_DEPOT_OUTER        =-10 + DIST_X_DEPOT_CENTER;
+
   static double DIST_X_FOUNDATION_CENTER  = 35;
+
   static double DIST_Y_FOUNDATION_CENTER  = 15;
-  static double DIST_Y_FOUNDATION_OUTER   = 40;
+  static double DIST_Y_FOUNDATION_OUTER   = 35 + DIST_Y_FOUNDATION_CENTER;
+
+  static double LUMIN_THRESHOLD           = 400;
+
 
   static int optLuminG =  0;
   static int optDistNL = -1;
@@ -59,8 +70,6 @@ public class OmniR0 extends LinearOpMode {
   static int optDistSG =  3;
   static int optTimeL  = -4;
 
-  double lumin = 100;
-  static double LUMIN_THRESHOLD = 80;
 
   boolean shouldGrab = false;
 
@@ -125,6 +134,8 @@ public class OmniR0 extends LinearOpMode {
 
     grab();
 
+    time  = getRuntime();
+
     distN = ( distN + senseDistN.getDistance(DistanceUnit.INCH) ) / 2;
     distX = ( distX + senseDistX.getDistance(DistanceUnit.INCH) ) / 2;
     distS = ( distS + senseDistS.getDistance(DistanceUnit.INCH) ) / 2;
@@ -186,7 +197,7 @@ public class OmniR0 extends LinearOpMode {
       break;
 
       case -4:
-        while(opModeIsActive() && getRuntime() < comparator){
+        while(opModeIsActive() && time < comparator){
           update();
         }
       break;
@@ -197,8 +208,7 @@ public class OmniR0 extends LinearOpMode {
 
   private void runFor(double duration){
 
-    runtime.reset();
-    runWhile(optTimeL, duration);
+    runWhile(optTimeL, duration + getRuntime());
 
   }
 
@@ -219,12 +229,12 @@ public class OmniR0 extends LinearOpMode {
     waitForStart();
     runtime.reset();
 
-    driveX(0.5);
+
+    driveX(0.5); //drive sideways to within 5in of depot
     runWhile(optDistXL, DIST_X_DEPOT_OUTER);
 
-    driveY(0.5);
+    driveY(0.5); //drive forwards until skystone
     runWhile(optLuminG, LUMIN_THRESHOLD);
-
 
     //drive back for .2s
     driveY(-0.5);
