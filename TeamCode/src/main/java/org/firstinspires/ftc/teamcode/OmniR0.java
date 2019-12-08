@@ -50,10 +50,8 @@ public class OmniR0 extends LinearOpMode {
   double DIST_Y_FOUNDATION_CENTER  = 15;
   double DIST_Y_FOUNDATION_OUTER   = 40;
 
-  double sliderPos = 0;
-  double sliderPosCache = 0;
-
   double lumin = 1;
+  double LUMIN_THRESHOLD = 0.3;
 
   boolean shouldGrab = false;
 
@@ -156,7 +154,7 @@ public class OmniR0 extends LinearOpMode {
 
 
     driveY(0.5);
-    runWhile(distN > 5 && lumin < 0.3);
+    runWhile(distN > DIST_WALL && lumin < LUMIN_THRESHOLD);
 
 
     //drive back for .2s
