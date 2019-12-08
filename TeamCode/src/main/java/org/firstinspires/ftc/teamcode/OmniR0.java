@@ -33,10 +33,9 @@ public class OmniR0 extends LinearOpMode {
 
   private ColorSensor     color   = null;
 
-  private DistanceSensor  distN   = null;
-  private DistanceSensor  distE   = null;
-  private DistanceSensor  distS   = null;
-  private DistanceSensor  distW   = null;
+  private DistanceSensor  senseDistN   = null;
+  private DistanceSensor  senseDistX   = null;
+  private DistanceSensor  senseDistS   = null;
 
   double distN = 30;
   double distX = 0;
