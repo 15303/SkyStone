@@ -45,6 +45,7 @@ public class OmniR0 extends LinearOpMode {
   static double DIST_Y_SKYBRIDGE          = 60;
   static double DIST_X_INTRACK_OUTER      = 25;
   static double DIST_X_DEPOT_CENTER       = 40;
+  static double DIST_X_DEPOT_OUTER        = 20;
   static double DIST_X_FOUNDATION_CENTER  = 35;
   static double DIST_Y_FOUNDATION_CENTER  = 15;
   static double DIST_Y_FOUNDATION_OUTER   = 40;
@@ -233,6 +234,8 @@ public class OmniR0 extends LinearOpMode {
     waitForStart();
     runtime.reset();
 
+    driveX(0.5);
+    runWhile(optdistSL, DIST_X_DEPOT_OUTER);
 
     driveY(0.5);
     runWhile(optLuminG, LUMIN_THRESHOLD);
