@@ -37,9 +37,9 @@ public class OmniR0 extends LinearOpMode {
   private DistanceSensor  senseDistX   = null;
   private DistanceSensor  senseDistS   = null;
 
-  double distN[] = {30,    30, 30, 30, 30, 30, 30, 30, 30 };
-  double distX[] = {0,     0,  0,  0,  0,  0,  0,  0,  0  };
-  double distS[] = {100,   100,100,100,100,100,100,100,100};
+  double distN = 30;
+  double distX = 0;
+  double distS = 100;
 
   static double DIST_WALL                 = 5;
   static double DIST_Y_SKYBRIDGE          = 60;
@@ -59,8 +59,8 @@ public class OmniR0 extends LinearOpMode {
   static int optDistSG =  3;
   static int optTimeL  = -4;
 
-  double lumin[] = {1,     1,1,1,1,1,1,1,1};
-  static double LUMIN_THRESHOLD = 0.3;
+  double lumin = 100;
+  static double LUMIN_THRESHOLD = 80;
 
   boolean shouldGrab = false;
 
@@ -125,31 +125,15 @@ public class OmniR0 extends LinearOpMode {
 
     grab();
 
-    distN[0] = 0;
-    distX[0] = 0;
-    distS[0] = 0;
-    lumin[0] = 0;
+    distN = ( distN + senseDistN.getDistance(DistanceUnit.CM) ) / 2;
+    distX = ( distX + senseDistX.getDistance(DistanceUnit.CM) ) / 2;
+    distS = ( distS + senseDistS.getDistance(DistanceUnit.CM) ) / 2;
+    lumin = ( lumin + senseColor.red()+senseColor.green()+senseColor.blue() ) / 2
 
-    distN[8] = senseDistN.getDistance(DistanceUnit.CM);
-    distN[0]+= distN[8];
-    distN[0]/= 8;
-
-    distX[8] = senseDistX.getDistance(DistanceUnit.CM);
-    distX[0]+= distN[8];
-    distX[0]/= 8;
-
-    distS[8] = senseDistS.getDistance(DistanceUnit.CM);
-    distS[0]+= distN[8];
-    distS[0]/= 8;
-
-    lumin[8] = senseColor.red()+senseColor.green()+senseColor.blue();
-    lumin[0]+= lumin[8];
-    lumin[0]/= 8;
-
-    telemetry.addData("lumin", lumin[0]);
-    telemetry.addData("distN", distN[0]);
-    telemetry.addData("distX", distX[0]);
-    telemetry.addData("distS", distS[0]);
+    telemetry.addData("distN", distN);
+    telemetry.addData("distX", distX);
+    telemetry.addData("distS", distS);
+    telemetry.addData("lumin", lumin);
     telemetry.update();
 
   }
@@ -159,44 +143,44 @@ public class OmniR0 extends LinearOpMode {
     switch(option){
 
       case 0:
-        while(opModeIsActive() && lumin[0] > comparator){
+        while(opModeIsActive() && lumin > comparator){
           update();
         }
       break;
 
       case -1:
-        while(opModeIsActive() && distN[0] < comparator){
+        while(opModeIsActive() && distN < comparator){
           update();
         }
       break;
 
       case 1:
-        while(opModeIsActive() && distN[0] > comparator){
+        while(opModeIsActive() && distN > comparator){
           update();
         }
       break;
 
       case -2:
-        while(opModeIsActive() && distX[0] < comparator){
+        while(opModeIsActive() && distX < comparator){
           update();
         }
       break;
 
       case 2:
-        while(opModeIsActive() && distX[0] > comparator){
+        while(opModeIsActive() && distX > comparator){
           update();
         }
       break;
 
 
       case -3:
-        while(opModeIsActive() && distS[0] < comparator){
+        while(opModeIsActive() && distS < comparator){
           update();
         }
       break;
 
       case 3:
-        while(opModeIsActive() && distS[0] > comparator){
+        while(opModeIsActive() && distS > comparator){
           update();
         }
       break;
