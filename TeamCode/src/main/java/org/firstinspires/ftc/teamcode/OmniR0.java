@@ -31,7 +31,7 @@ public class OmniR0 extends LinearOpMode {
   private DcMotor         slider  = null;
   private Servo           grabber = null;
 
-  private ColorSensor     color   = null;
+  private ColorSensor     senseColor   = null;
 
   private DistanceSensor  senseDistN   = null;
   private DistanceSensor  senseDistX   = null;
@@ -126,7 +126,12 @@ public class OmniR0 extends LinearOpMode {
     distN = ( distN + senseDistN.getDistance(DistanceUnit.CM) ) / 2;
     distX = ( distX + senseDistX.getDistance(DistanceUnit.CM) ) / 2;
     distS = ( distS + senseDistS.getDistance(DistanceUnit.CM) ) / 2;
-    lumin = ( lumin + (senseColor.red()+senseColor.green()+senseColor.blue()) / 3 ) / 2;
+    lumin = ( lumin + (senseColor.red()+senseColor.green()+senseColor.blue())/765 ) / 2;
+    telemetry.addData("lumin", lumin);
+    telemetry.addData("distN", distN);
+    telemetry.addData("distX", distX);
+    telemetry.addData("distS", distS);
+    telemetry.update();
 
   }
 
@@ -178,7 +183,7 @@ public class OmniR0 extends LinearOpMode {
       break;
 
       case -4:
-        while(opModeIsActive() && runtime < comparator){
+        while(opModeIsActive() && getRuntime() < comparator){
           update();
         }
       break;
@@ -210,8 +215,6 @@ public class OmniR0 extends LinearOpMode {
 
     waitForStart();
     runtime.reset();
-
-    runWhile();
 
 
     driveY(0.5);
