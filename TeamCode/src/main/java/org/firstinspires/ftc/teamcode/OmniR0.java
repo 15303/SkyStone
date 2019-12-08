@@ -42,16 +42,25 @@ public class OmniR0 extends LinearOpMode {
   double distX = 0;
   double distS = 100;
 
-  double DIST_WALL                 = 5;
-  double DIST_Y_SKYBRIDGE          = 60;
-  double DIST_X_INTRACK_OUTER      = 25;
-  double DIST_X_DEPOT_CENTER       = 40;
-  double DIST_X_FOUNDATION_CENTER  = 35;
-  double DIST_Y_FOUNDATION_CENTER  = 15;
-  double DIST_Y_FOUNDATION_OUTER   = 40;
+  static double DIST_WALL                 = 5;
+  static double DIST_Y_SKYBRIDGE          = 60;
+  static double DIST_X_INTRACK_OUTER      = 25;
+  static double DIST_X_DEPOT_CENTER       = 40;
+  static double DIST_X_FOUNDATION_CENTER  = 35;
+  static double DIST_Y_FOUNDATION_CENTER  = 15;
+  static double DIST_Y_FOUNDATION_OUTER   = 40;
+
+  static int optLuminG =  0;
+  static int optDistNL = -1;
+  static int optDistNG =  1;
+  static int optDistXL = -2;
+  static int optDistXG =  2;
+  static int optDistSL = -3;
+  static int optDistSG =  3;
+  static int optTimeL  = -4;
 
   double lumin = 1;
-  double LUMIN_THRESHOLD = 0.3;
+  static double LUMIN_THRESHOLD = 0.3;
 
   boolean shouldGrab = false;
 
@@ -112,15 +121,68 @@ public class OmniR0 extends LinearOpMode {
 
   }
 
-  private void runWhile(boolean conditions){
+  private void update(){
 
-    while(opModeIsActive && conditions){
+    grab();
+    distN = ( distN + senseDistN.getDistance(DistanceUnit.CM) ) / 2;
+    distX = ( distX + senseDistX.getDistance(DistanceUnit.CM) ) / 2;
+    distS = ( distS + senseDistS.getDistance(DistanceUnit.CM) ) / 2;
+    lumin = ( lumin + (senseColor.red()+senseColor.green()+senseColor.blue()) / 3 ) / 2;
 
-      grab();
-      distN = ( distN + senseDistN.getDistance(DistanceUnit.CM) ) / 2;
-      distX = ( distX + senseDistX.getDistance(DistanceUnit.CM) ) / 2;
-      distS = ( distS + senseDistS.getDistance(DistanceUnit.CM) ) / 2;
-      lumin = ( lumin + (senseColor.red()+senseColor.green()+senseColor.blue()) / 3 ) / 2;
+  }
+
+  private void runWhile(int option, double comparator){
+
+    switch(option){
+
+      case 0:
+        while(opModeIsActive() && lumin > comparator){
+          update();
+        }
+      break;
+
+      case -1:
+        while(opModeIsActive() && distN < comparator){
+          update();
+        }
+      break;
+
+      case 1:
+        while(opModeIsActive() && distN > comparator){
+          update();
+        }
+      break;
+
+      case -2:
+        while(opModeIsActive() && distX < comparator){
+          update();
+        }
+      break;
+
+      case 2:
+        while(opModeIsActive() && distX > comparator){
+          update();
+        }
+      break;
+
+
+      case -3:
+        while(opModeIsActive() && distS < comparator){
+          update();
+        }
+      break;
+
+      case 3:
+        while(opModeIsActive() && distS > comparator){
+          update();
+        }
+      break;
+
+      case -4:
+        while(opModeIsActive() && runtime < comparator){
+          update();
+        }
+      break;
 
     }
 
@@ -129,7 +191,7 @@ public class OmniR0 extends LinearOpMode {
   private void runFor(double duration){
 
     runtime.reset();
-    runWhile(runtime > duration);
+    runWhile(optTimeL, duration);
 
   }
 
@@ -154,7 +216,7 @@ public class OmniR0 extends LinearOpMode {
 
 
     driveY(0.5);
-    runWhile(distN > DIST_WALL && lumin < LUMIN_THRESHOLD);
+    runWhile(optLuminG, LUMIN_THRESHOLD);
 
 
     //drive back for .2s
@@ -163,7 +225,7 @@ public class OmniR0 extends LinearOpMode {
 
     //drive sideways to stone depot
     driveX(0.5);
-    runWhile(distX < DIST_X_DEPOT_CENTER);
+    runWhile(optDistXL, DIST_X_DEPOT_CENTER);
 
     //drive forward for .2s
     driveY(0.5);
@@ -177,11 +239,11 @@ public class OmniR0 extends LinearOpMode {
 
     //drive sideways to inner track
     driveX(-0.5);
-    runWhile(distX > DIST_X_INTRACK_OUTER);
+    runWhile(optDistXG, DIST_X_INTRACK_OUTER);
 
     //drive back until centered on foundation's long side
     driveY(-0.5);
-    runWhile(distS > DIST_Y_FOUNDATION_CENTER);
+    runWhile(optDistSG, DIST_Y_FOUNDATION_CENTER);
     driveY(0);
 
 
@@ -190,7 +252,7 @@ public class OmniR0 extends LinearOpMode {
 
     //drive sideways until touching wall
     driveX(-0.5);
-    runWhile(distX > DIST_WALL);
+    runWhile(optDistXG, DIST_WALL);
     driveX(0);
 
     //release foundation grabber
@@ -198,11 +260,11 @@ public class OmniR0 extends LinearOpMode {
 
     //drive forward until clear of foundation
     driveY(0.5);
-    runWhile(distS < DIST_Y_FOUNDATION_OUTER);
+    runWhile(optDistSL, DIST_Y_FOUNDATION_OUTER);
 
     //drive sideways until centered on foundation's short side
     driveX(0.5);
-    runWhile(distX < DIST_X_FOUNDATION_CENTER);
+    runWhile(optDistXL, DIST_X_FOUNDATION_CENTER);
 
     //spin 180deg
     driveSpn(1);
@@ -237,12 +299,12 @@ public class OmniR0 extends LinearOpMode {
     //drive sideways to inner track
 
     driveX(-0.5);
-    runWhile(distX > DIST_X_INTRACK_OUTER);
+    runWhile(optDistXG, DIST_X_INTRACK_OUTER);
 
     //drive forward to under bridge
 
     driveY(0.5);
-    runWhile(distN > DIST_Y_SKYBRIDGE && distS > DIST_Y_SKYBRIDGE);
+    runWhile(optDistSL, DIST_Y_SKYBRIDGE);
 
     driveX(0);
 
