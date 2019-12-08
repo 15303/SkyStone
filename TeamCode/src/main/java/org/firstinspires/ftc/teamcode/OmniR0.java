@@ -247,7 +247,7 @@ public class OmniR0 extends LinearOpMode {
     runtime.reset();
 
     driveX(0.5);
-    runWhile(optDistSL, DIST_X_DEPOT_OUTER);
+    runWhile(optDistXL, DIST_X_DEPOT_OUTER);
 
     driveY(0.5);
     runWhile(optLuminG, LUMIN_THRESHOLD);
@@ -259,7 +259,7 @@ public class OmniR0 extends LinearOpMode {
 
     //drive sideways to stone depot
     driveX(0.5);
-    runWhile(optDistSL, DIST_X_DEPOT_CENTER);
+    runWhile(optDistXL, DIST_X_DEPOT_CENTER);
 
     //drive forward for .2s
     driveY(0.5);
@@ -273,7 +273,7 @@ public class OmniR0 extends LinearOpMode {
 
     //drive sideways to inner track
     driveX(-0.5);
-    runWhile(optDistSG, DIST_X_INTRACK_OUTER);
+    runWhile(optDistXG, DIST_X_INTRACK_OUTER);
 
     //drive back until centered on foundation's long side
     driveY(-0.5);
@@ -286,7 +286,7 @@ public class OmniR0 extends LinearOpMode {
 
     //drive sideways until touching wall
     driveX(-0.5);
-    runWhile(optDistSG, DIST_WALL);
+    runWhile(optDistXG, DIST_WALL);
     driveX(0);
 
     //release foundation grabber
@@ -298,7 +298,7 @@ public class OmniR0 extends LinearOpMode {
 
     //drive sideways until centered on foundation's short side
     driveX(0.5);
-    runWhile(optDistSL, DIST_X_FOUNDATION_CENTER);
+    runWhile(optDistXL, DIST_X_FOUNDATION_CENTER);
 
     //spin 180deg
     driveSpn(1);
@@ -333,7 +333,7 @@ public class OmniR0 extends LinearOpMode {
     //drive sideways to inner track
 
     driveX(-0.5);
-    runWhile(optDistSG, DIST_X_INTRACK_OUTER);
+    runWhile(optDistXG, DIST_X_INTRACK_OUTER);
 
     //drive forward to under bridge
 
