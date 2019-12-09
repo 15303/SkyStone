@@ -25,7 +25,8 @@ public class OmniX extends LinearOpMode {
 
   double[] stickX  = {0,0,0,0};
   double[] stickY  = {0,0,0,0};
-  double[] trigger = {0,0};
+  double[] trigL   = {0,0};
+  double[] trigR   = {0,0};
 
   double driveRht = 0;
   double driveFwd = 0;
@@ -45,11 +46,11 @@ public class OmniX extends LinearOpMode {
 
     private double avg = sum/array.length;
 
-    private double square = Math.signum(avg) * Math.pow(avg,2);
+    private double power = Math.signum(avg) * Math.pow(avg,2);
 
     private final int STEPS = 16;
 
-    return ( Math.round( STEPS * SQUARE ) / STEPS );
+    return ( Math.round( STEPS * power ) / STEPS );
   }
 
   @Override
@@ -89,13 +90,14 @@ public class OmniX extends LinearOpMode {
 
         //define
 
-        stickX  = new double[]{ gamepad1.left_stick_x, gamepad2.left_stick_x, gamepad1.right_stick_x, gamepad2.right_stick_x };
-        stickY  = new double[]{ gamepad1.left_stick_y, gamepad2.left_stick_y, gamepad1.right_stick_y, gamepad2.right_stick_y };
-        trigger = new double[]{ gamepad1.left_trigger, -gamepad1.right_trigger};
+        stickX  = new double[]{ gamepad1.left_stick_x,  gamepad2.left_stick_x, gamepad1.right_stick_x, gamepad2.right_stick_x };
+        stickY  = new double[]{ gamepad1.left_stick_y,  gamepad2.left_stick_y, gamepad1.right_stick_y, gamepad2.right_stick_y };
+        trigL   = new double[]{ gamepad1.left_trigger,  gamepad2.left_trigger };
+        trigR   = new double[]{ gamepad1.right_trigger, gamepad2.right_trigger };
 
-        driveRht = -inputCurve( stickX );
-        driveFwd =  inputCurve( stickY );
-        driveC   =  inputCurve( trigger );
+        driveRht = - inputCurve( stickX );
+        driveFwd =   inputCurve( stickY );
+        driveC   =   inputCurve( trigL ) - inputCurve( trigR );
 
         sliderPower = ( gamepad1.dpad_left  || gamepad2.dpad_left  ) ?  1
                     : ( gamepad1.dpad_right || gamepad2.dpad_right ) ? -1
