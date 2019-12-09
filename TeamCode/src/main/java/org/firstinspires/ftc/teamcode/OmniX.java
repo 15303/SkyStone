@@ -46,7 +46,7 @@ public class OmniX extends LinearOpMode {
 
 
 
-  private double inputCurve(double[] array){
+  static double inputCurve(double[] array){
 
 
 
