@@ -23,12 +23,34 @@ public class OmniX extends LinearOpMode {
   private DcMotor slider  = null;
   private Servo   grabber = null;
 
-  double driveRht   = 0;
-  double driveFwd   = 0;
-  double driveC     = 0;
+  double[] stickX  = {0,0,0,0};
+  double[] stickY  = {0,0,0,0};
+  double[] trigger = {0,0};
 
-  double sliderPower   = 0;
-  double grabberPos = 0.7;
+  double driveRht = 0;
+  double driveFwd = 0;
+  double driveC   = 0;
+
+  double sliderPower  = 0;
+  double grabberPos   = 0.7;
+
+
+  private double inputCurve(double[] array){
+
+    private double sum = 0;
+
+    for(private int i = 0; i < array.length; i++){
+      sum += array[i];
+    }
+
+    private double avg = sum/array.length;
+
+    private double square = Math.signum(avg) * Math.pow(avg,2);
+
+    private final int STEPS = 16;
+
+    return ( Math.round( STEPS * SQUARE ) / STEPS );
+  }
 
   @Override
   public void runOpMode() {
@@ -67,9 +89,13 @@ public class OmniX extends LinearOpMode {
 
         //define
 
-        driveRht = - Math.round(20*( Math.pow( ( gamepad1.left_stick_x + gamepad2.left_stick_x ) , 3 ) + Math.pow( ( gamepad1.right_stick_x + gamepad2.right_stick_x ) , 3 ))) / 40;
-        driveFwd =   Math.round(20*( Math.pow( ( gamepad1.left_stick_y + gamepad2.left_stick_y ) , 3 ) + Math.pow( ( gamepad1.right_stick_y + gamepad2.right_stick_y ) , 3 ))) / 40;
-        driveC   =   Math.round(20*Math.pow( ( gamepad1.left_trigger - gamepad1.right_trigger ) , 3 )) / 20;
+        stickX  = new double[]{ gamepad1.left_stick_x, gamepad2.left_stick_x, gamepad1.right_stick_x, gamepad2.right_stick_x };
+        stickY  = new double[]{ gamepad1.left_stick_y, gamepad2.left_stick_y, gamepad1.right_stick_y, gamepad2.right_stick_y };
+        trigger = new double[]{ gamepad1.left_trigger, -gamepad1.right_trigger};
+
+        driveRht = -inputCurve( stickX );
+        driveFwd =  inputCurve( stickY );
+        driveC   =  inputCurve( trigger );
 
         sliderPower = ( gamepad1.dpad_left  || gamepad2.dpad_left  ) ?  1
                     : ( gamepad1.dpad_right || gamepad2.dpad_right ) ? -1
