@@ -35,22 +35,27 @@ public class OmniX extends LinearOpMode {
   double sliderPower  = 0;
   double grabberPos   = 0.7;
 
+  static int STEP = 16;
 
   private double inputCurve(double[] array){
 
-    private double sum = 0;
+    double sum = 0;
 
-    for(private int i = 0; i < array.length; i++){
+    for(int i = 0; i < array.length; i++){
       sum += array[i];
     }
 
-    private double avg = sum/array.length;
+    double avg = 2*sum/array.length;
 
-    private double power = Math.signum(avg) * Math.pow(avg,2);
+    if( Math.abs(avg) < 0.1 ){
+      return 0;
+    }
 
-    private final int STEPS = 16;
+    double sign = Math.signum(avg);
 
-    return ( Math.round( STEPS * power ) / STEPS );
+    double power = Math.pow(avg,2);
+
+    return ( ( Math.round( STEP * sign * power ) + sign ) / STEP );
   }
 
   @Override
@@ -95,9 +100,16 @@ public class OmniX extends LinearOpMode {
         trigL   = new double[]{ gamepad1.left_trigger,  gamepad2.left_trigger };
         trigR   = new double[]{ gamepad1.right_trigger, gamepad2.right_trigger };
 
-        driveRht = - inputCurve( stickX );
+
+        driveRht = ( gamepad1.left_stick_button  || gamepad2.left_stick_button  ) ? (  1/STEP )
+                 : ( gamepad1.right_stick_button || gamepad2.right_stick_button ) ? ( -1/STEP )
+                 : - inputCurve( stickX );
+
         driveFwd =   inputCurve( stickY );
-        driveC   =   inputCurve( trigL ) - inputCurve( trigR );
+
+        driveC   = ( gamepad1.left_bumper  || gamepad2.left_bumper  ) ? (  1/STEP )
+                 : ( gamepad1.right_bumper || gamepad2.right_bumper ) ? ( -1/STEP )
+                 :                    ( inputCurve( trigL ) - inputCurve( trigR ) );
 
         sliderPower = ( gamepad1.dpad_left  || gamepad2.dpad_left  ) ?  1
                     : ( gamepad1.dpad_right || gamepad2.dpad_right ) ? -1
@@ -120,11 +132,11 @@ public class OmniX extends LinearOpMode {
 
       }
 
-      telemetry.addData( "DriveRht     " , driveRht    );
-      telemetry.addData( "DriveFwd     " , driveFwd    );
-      telemetry.addData( "DriveC       " , driveC      );
-      telemetry.addData( "sliderPower  " , sliderPower );
-      telemetry.addData( "GrabberPos   " , grabberPos  );
+      telemetry.addData( "DriveRht"    , driveRht    );
+      telemetry.addData( "DriveFwd"    , driveFwd    );
+      telemetry.addData( "DriveC"      , driveC      );
+      telemetry.addData( "SliderPower" , sliderPower );
+      telemetry.addData( "GrabberPos"  , grabberPos  );
       telemetry.update();
 
     }
