@@ -44,8 +44,7 @@ public class OmniX extends LinearOpMode {
 
 
   static int STEP  = 16;
-  double driveMax  = 0;
-  double normalize = 0;
+  double normalize = 1;
 
   double driveRht  = 0;
   double driveFwd  = 0;
@@ -169,23 +168,22 @@ public class OmniX extends LinearOpMode {
 
         stickX  = new double[]{ gamepad1.left_stick_x,  gamepad2.left_stick_x, gamepad1.right_stick_x, gamepad2.right_stick_x };
         stickY  = new double[]{ gamepad1.left_stick_y,  gamepad2.left_stick_y, gamepad1.right_stick_y, gamepad2.right_stick_y };
-        trigL   = new double[]{ gamepad1.left_trigger,  gamepad2.left_trigger };
+        trigL   = new double[]{ gamepad1.left_trigger,  gamepad2.left_trigger  };
         trigR   = new double[]{ gamepad1.right_trigger, gamepad2.right_trigger };
 
 
         driveRht = ( gamepad1.left_stick_button  || gamepad2.left_stick_button  ) ? (  1/STEP )
                  : ( gamepad1.right_stick_button || gamepad2.right_stick_button ) ? ( -1/STEP )
-                 : - inputCurve( stickX );
+                 :                                                                 - inputCurve( stickX );
 
         driveFwd =   inputCurve( stickY );
 
         driveC   = ( gamepad1.left_bumper  || gamepad2.left_bumper  ) ? (  1/STEP )
                  : ( gamepad1.right_bumper || gamepad2.right_bumper ) ? ( -1/STEP )
-                 :                    ( inputCurve( trigL ) - inputCurve( trigR ) );
+                 :                                                      ( inputCurve( trigL ) - inputCurve( trigR ) );
 
 
-        driveMax  = Math.abs(driveRht) + Math.abs(driveFwd) + Math.abs(driveC);
-        normalize = ( driveMax > 1 ) ? driveMax : 1;
+        normalize = Math.max ( Math.abs(driveRht) + Math.abs(driveFwd) + Math.abs(driveC) , 1)
 
 
         //driving do
