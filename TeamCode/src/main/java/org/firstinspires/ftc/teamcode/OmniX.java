@@ -26,7 +26,7 @@ public class OmniX extends LinearOpMode {
   double driveRht   = 0;
   double driveFwd   = 0;
   double driveC     = 0;
-  
+
   double sliderPower   = 0;
   double grabberPos = 0.7;
 
@@ -58,23 +58,23 @@ public class OmniX extends LinearOpMode {
         driveNE.setPower( -1 );
         driveSE.setPower(  1 );
         driveSW.setPower( -1 );
-        
+
         sleep(3000);
 
       }else{
 
         telemetry.addData( "Status     " , "X Running" );
-        
+
         //define
 
-        driveRht = - 0.5 * ( Math.pow( ( gamepad1.left_stick_x + gamepad2.left_stick_x ) , 3 ) + Math.pow( ( gamepad1.right_stick_x + gamepad2.right_stick_x ) , 3 ) );
-        driveFwd =   0.5 * ( Math.pow( ( gamepad1.left_stick_y + gamepad2.left_stick_y ) , 3 ) + Math.pow( ( gamepad1.right_stick_y + gamepad2.right_stick_y ) , 3 ) );
-        driveC   =   1.0  * ( Math.pow( ( gamepad1.left_trigger - gamepad1.right_trigger ) , 3 ) );
-        
+        driveRht = - Math.round(20*( Math.pow( ( gamepad1.left_stick_x + gamepad2.left_stick_x ) , 3 ) + Math.pow( ( gamepad1.right_stick_x + gamepad2.right_stick_x ) , 3 ))) / 40;
+        driveFwd =   Math.round(20*( Math.pow( ( gamepad1.left_stick_y + gamepad2.left_stick_y ) , 3 ) + Math.pow( ( gamepad1.right_stick_y + gamepad2.right_stick_y ) , 3 ))) / 40;
+        driveC   =   Math.round(20*Math.pow( ( gamepad1.left_trigger - gamepad1.right_trigger ) , 3 )) / 20;
+
         sliderPower = ( gamepad1.dpad_left  || gamepad2.dpad_left  ) ?  1
                     : ( gamepad1.dpad_right || gamepad2.dpad_right ) ? -1
                     :                                                   0;
-          
+
 
         grabberPos = ( gamepad1.dpad_up   || gamepad2.dpad_up   ) ?  0
                    : ( gamepad1.dpad_down || gamepad2.dpad_down ) ?  0.7
@@ -86,12 +86,12 @@ public class OmniX extends LinearOpMode {
         driveNE.setPower(   driveRht - driveFwd + driveC );
         driveSE.setPower( - driveRht - driveFwd + driveC );
         driveSW.setPower( - driveRht + driveFwd + driveC );
-        
+
         slider.setPower(sliderPower);
         grabber.setPosition(grabberPos);
 
       }
-      
+
       telemetry.addData( "DriveRht     " , driveRht    );
       telemetry.addData( "DriveFwd     " , driveFwd    );
       telemetry.addData( "DriveC       " , driveC      );
