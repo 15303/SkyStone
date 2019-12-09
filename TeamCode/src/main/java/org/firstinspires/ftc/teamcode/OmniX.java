@@ -8,8 +8,19 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+
+
+
+
+
+
+
+
+
 @TeleOp(name="OmniX", group="Linear Opmode")
 //@Disabled
+
+
 
 public class OmniX extends LinearOpMode {
 
@@ -46,13 +57,13 @@ public class OmniX extends LinearOpMode {
 
 
 
-  static double inputCurve(double[] array){
+  static double inputCurve( double[] array ) {
 
 
 
     double sum = 0;
 
-    for(int i = 0; i < array.length; i++){
+    for( int i = 0; i < array.length; i++ ){
       sum += array[i];
     }
 
@@ -71,6 +82,18 @@ public class OmniX extends LinearOpMode {
 
 
   }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
