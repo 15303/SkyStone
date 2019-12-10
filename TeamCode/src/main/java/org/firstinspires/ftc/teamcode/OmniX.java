@@ -68,18 +68,18 @@ public class OmniX extends LinearOpMode {
 
 
 
-  double[] stickX  = {0,0,0,0};
-  double[] stickY  = {0,0,0,0};
-  double[] trigL   = {0,0};
-  double[] trigR   = {0,0};
+  double[] stickX  = { 0 , 0 , 0 , 0 } ;
+  double[] stickY  = { 0 , 0 , 0 , 0 } ;
+  double[] trigL   = { 0 , 0 } ;
+  double[] trigR   = { 0 , 0 } ;
 
   final int STEP   = 16;
 
-  double throttleCurve( double[] array ) {
+  double throttleCurve ( double[] array ) {
 
     double sum   = 0;
 
-    for( int i = 0; i < array.length; i++ ){
+    for ( int i = 0; i < array.length; i++ ) {
 
       sum += array[i];
 
@@ -87,17 +87,17 @@ public class OmniX extends LinearOpMode {
 
     double avg   = 2 * sum / array.length;
 
-    if( Math.abs(avg) < 0.1 ){
+    if ( Math.abs( avg ) < 0.1 ) {
 
       return 0;
 
     }
 
-    double sign  = Math.signum( avg );
+    double sign  = Math.signum ( avg ) ;
 
-    double power = Math.pow( avg , 2 );
+    double power = Math.pow    ( avg , 2 ) ;
 
-    return ( ( Math.round( STEP * sign * power ) + sign ) / STEP );
+    return ( ( Math.round( STEP * sign * power ) + sign ) / STEP ) ;
 
   }
 
@@ -141,33 +141,33 @@ public class OmniX extends LinearOpMode {
 
 
 
-    telemetry.addData( "Status    " , "OmniX Initialized" );
-    telemetry.update();
+    telemetry.addData ( "Status    " , "OmniX Initialized" ) ;
+    telemetry.update  (                                    ) ;
 
 
 
-    driveNW = hardwareMap.get( DcMotor.class, "driveNW" );
-    driveNE = hardwareMap.get( DcMotor.class, "driveNE" );
-    driveSE = hardwareMap.get( DcMotor.class, "driveSE" );
-    driveSW = hardwareMap.get( DcMotor.class, "driveSW" );
+    driveNW = hardwareMap.get ( DcMotor.class , "driveNW" ) ;
+    driveNE = hardwareMap.get ( DcMotor.class , "driveNE" ) ;
+    driveSE = hardwareMap.get ( DcMotor.class , "driveSE" ) ;
+    driveSW = hardwareMap.get ( DcMotor.class , "driveSW" ) ;
 
-    slider  = hardwareMap.get( DcMotor.class, "slider"  );
-    grabber = hardwareMap.get( Servo.class  , "grabber" );
-
-
-
-    waitForStart();
-    telemetry.addData( "Status     " , "OmniX Active" );
+    slider  = hardwareMap.get ( DcMotor.class , "slider"  ) ;
+    grabber = hardwareMap.get ( Servo.class   , "grabber" ) ;
 
 
 
-
+    waitForStart      (                                    ) ;
+    telemetry.addData ( "Status     " , "OmniX Active"     ) ;
 
 
 
 
 
-    while (opModeIsActive()) {
+
+
+
+
+    while ( opModeIsActive () ) {
 
 
 
@@ -189,24 +189,25 @@ public class OmniX extends LinearOpMode {
 
       //driving define
 
-      stickX  = new double[]{ gamepad1.left_stick_x,  gamepad2.left_stick_x,  gamepad1.right_stick_x,  gamepad2.right_stick_x };
-      stickY  = new double[]{ gamepad1.left_stick_y,  gamepad2.left_stick_y,  gamepad1.right_stick_y,  gamepad2.right_stick_y };
-      trigL   = new double[]{ gamepad1.left_trigger,  gamepad2.left_trigger  };
-      trigR   = new double[]{ gamepad1.right_trigger, gamepad2.right_trigger };
+      stickX  = new double[] { gamepad1.left_stick_x , gamepad2.left_stick_x , gamepad1.right_stick_x , gamepad2.right_stick_x } ;
+      stickY  = new double[] { gamepad1.left_stick_y , gamepad2.left_stick_y , gamepad1.right_stick_y , gamepad2.right_stick_y } ;
+      trigL   = new double[] { gamepad1.left_trigger , gamepad2.left_trigger                                                   } ;
+      trigR   = new double[] { gamepad1.right_trigger, gamepad2.right_trigger                                                  } ;
 
 
-      driveRht = ( gamepad1.left_stick_button  || gamepad2.left_stick_button  ) ? (  1/STEP )
-               : ( gamepad1.right_stick_button || gamepad2.right_stick_button ) ? ( -1/STEP )
-               :                                                                  ( - throttleCurve( stickX ) );
 
-      driveFwd =   throttleCurve( stickY );
+      driveFwd =   throttleCurve( stickY ) ;
 
-      driveC   = ( gamepad1.left_bumper  || gamepad2.left_bumper  ) ? (  1/STEP )
-               : ( gamepad1.right_bumper || gamepad2.right_bumper ) ? ( -1/STEP )
-               :                                                      ( throttleCurve( trigL ) - throttleCurve( trigR ) );
+      driveRht = ( gamepad1.left_stick_button  || gamepad2.left_stick_button  ) ? (  1/STEP                                          )
+               : ( gamepad1.right_stick_button || gamepad2.right_stick_button ) ? ( -1/STEP                                          )
+               :                                                                  ( - throttleCurve( stickX )                        ) ;
+
+      driveC   = ( gamepad1.left_bumper        || gamepad2.left_bumper        ) ? (  1/STEP                                          )
+               : ( gamepad1.right_bumper       || gamepad2.right_bumper       ) ? ( -1/STEP                                          )
+               :                                                                  (  throttleCurve( trigL ) - throttleCurve( trigR ) ) ;
 
 
-      normalize = Math.max ( Math.abs(driveRht) + Math.abs(driveFwd) + Math.abs(driveC) , 1 );
+      normalize = Math.max ( Math.abs ( driveRht ) + Math.abs ( driveFwd ) + Math.abs ( driveC ) , 1 ) ;
 
 
 
@@ -215,10 +216,10 @@ public class OmniX extends LinearOpMode {
 
       //driving do
 
-      driveNW.setPower( (   driveRht + driveFwd + driveC ) / normalize );
-      driveNE.setPower( (   driveRht - driveFwd + driveC ) / normalize );
-      driveSE.setPower( ( - driveRht - driveFwd + driveC ) / normalize );
-      driveSW.setPower( ( - driveRht + driveFwd + driveC ) / normalize );
+      driveNW.setPower ( (   driveRht + driveFwd + driveC ) / normalize ) ;
+      driveNE.setPower ( (   driveRht - driveFwd + driveC ) / normalize ) ;
+      driveSE.setPower ( ( - driveRht - driveFwd + driveC ) / normalize ) ;
+      driveSW.setPower ( ( - driveRht + driveFwd + driveC ) / normalize ) ;
 
 
 
@@ -237,12 +238,12 @@ public class OmniX extends LinearOpMode {
 
       sliderPower = ( gamepad1.dpad_left  || gamepad2.dpad_left  ) ?  1
                   : ( gamepad1.dpad_right || gamepad2.dpad_right ) ? -1
-                  :                                                   0;
+                  :                                                   0          ;
 
 
-      grabberPos = ( gamepad1.dpad_up   || gamepad2.dpad_up   ) ?  0
-                 : ( gamepad1.dpad_down || gamepad2.dpad_down ) ?  0.7
-                 :                                                 grabberPos;
+      grabberPos  = ( gamepad1.dpad_up     || gamepad2.dpad_up   ) ?  0
+                  : ( gamepad1.dpad_down   || gamepad2.dpad_down ) ?  0.7
+                  :                                                   grabberPos ;
 
 
 
@@ -251,8 +252,8 @@ public class OmniX extends LinearOpMode {
 
       // arm do
 
-      slider.setPower(sliderPower);
-      grabber.setPosition(grabberPos);
+      slider.setPower     ( sliderPower ) ;
+      grabber.setPosition ( grabberPos  ) ;
 
 
 
@@ -267,13 +268,13 @@ public class OmniX extends LinearOpMode {
 
       // telemetry
 
-      telemetry.addData( "Status     " , "OmniX Running" );
-      telemetry.addData( "DriveRht   " ,  driveRht       );
-      telemetry.addData( "DriveFwd   " ,  driveFwd       );
-      telemetry.addData( "DriveC     " ,  driveC         );
-      telemetry.addData( "SliderPower" ,  sliderPower    );
-      telemetry.addData( "GrabberPos " ,  grabberPos     );
-      telemetry.update();
+      telemetry.addData ( "Status     " , "OmniX Running"    ) ;
+      telemetry.addData ( "DriveRht   " ,  driveRht          ) ;
+      telemetry.addData ( "DriveFwd   " ,  driveFwd          ) ;
+      telemetry.addData ( "DriveC     " ,  driveC            ) ;
+      telemetry.addData ( "SliderPower" ,  sliderPower       ) ;
+      telemetry.addData ( "GrabberPos " ,  grabberPos        ) ;
+      telemetry.update  (                                    ) ;
 
 
 
