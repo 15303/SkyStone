@@ -7,7 +7,13 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
 
-@TeleOp(name="OmniX", group="Linear Opmode")
+@TeleOp (
+
+  name  = "OmniX"         ,
+  group = "Linear Opmode"
+
+)
+
 //@Disabled
 
 
@@ -93,7 +99,7 @@ public class OmniX extends LinearOpMode {
 
     }
 
-    double sign  = Math.signum ( avg ) ;
+    double sign  = Math.signum ( avg     ) ;
 
     double power = Math.pow    ( avg , 2 ) ;
 

@@ -13,7 +13,13 @@ import com.qualcomm.robotcore.util.Range ;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit ;
 import java.util.Locale ;
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous( name="OmniR0" , group="Linear Opmode" )
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous (
+
+  name  = "OmniR0"         ,
+  group = "Linear Opmode"
+
+)
+
 // @Disabled
 
 
