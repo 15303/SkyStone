@@ -81,7 +81,7 @@ public class OmniX extends LinearOpMode {
 
   final int MIN_THROTTLE = 16;
 
-  double throttleCurve ( double[] array ) {
+  double throttleCurve ( double[] array , degree ) {
 
     double sum   = 0;
 
@@ -101,7 +101,7 @@ public class OmniX extends LinearOpMode {
 
     double sign  = Math.signum ( avg     ) ;
 
-    double power = Math.pow    ( avg , 3 ) ;
+    double power = Math.pow    ( avg , 5 ) ;
 
     return ( power + ( sign - power ) / MIN_THROTTLE ) ;
 
@@ -204,13 +204,13 @@ public class OmniX extends LinearOpMode {
 
       driveFwd =   throttleCurve( stickY ) ;
 
-      driveRht = ( gamepad1.left_stick_button  || gamepad2.left_stick_button  ) ? (  1/MIN_THROTTLE                                  )
-               : ( gamepad1.right_stick_button || gamepad2.right_stick_button ) ? ( -1/MIN_THROTTLE                                  )
-               :                                                                  ( - throttleCurve( stickX )                        ) ;
+      driveRht = ( gamepad1.left_stick_button  || gamepad2.left_stick_button  ) ? (  1/MIN_THROTTLE                                      )
+               : ( gamepad1.right_stick_button || gamepad2.right_stick_button ) ? ( -1/MIN_THROTTLE                                      )
+               :                                                                  ( -throttleCurve( stickX )                             ) ;
 
-      driveC   = ( gamepad1.left_bumper        || gamepad2.left_bumper        ) ? (  1/MIN_THROTTLE                                  )
-               : ( gamepad1.right_bumper       || gamepad2.right_bumper       ) ? ( -1/MIN_THROTTLE                                  )
-               :                                                                  (  throttleCurve( trigL ) - throttleCurve( trigR ) ) ;
+      driveC   = ( gamepad1.left_bumper        || gamepad2.left_bumper        ) ? (  1/MIN_THROTTLE                                      )
+               : ( gamepad1.right_bumper       || gamepad2.right_bumper       ) ? ( -1/MIN_THROTTLE                                      )
+               :                                                                  (  throttleCurve ( trigL  ) - throttleCurve ( trigR  ) ) ;
 
 
       normalize = Math.max ( Math.abs ( driveRht ) + Math.abs ( driveFwd ) + Math.abs ( driveC ) , 1 ) ;
