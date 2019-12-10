@@ -96,19 +96,15 @@ public class OmniX extends LinearOpMode {
 
     }
 
-    double avg   = 2 * sum / array.length;
+    double avg   = 2 * sum / array.length ;
 
-    if ( avg > 1 / MIN_THROTTLE ) {
-
-      return 0 ;
-
-    }
-
+    double abs   = Math.abs    ( avg     ) ;
     double sign  = Math.signum ( avg     ) ;
-
     double power = Math.pow    ( avg , 5 ) ;
 
-    return ( power + MIN_THROTTLE * ( sign - power ) ) ;
+    return ( abs < MIN_THROTTLE ) ? 0
+                                  : ( power + MIN_THROTTLE * ( sign - power ) ) ;
+
 
   }
 
