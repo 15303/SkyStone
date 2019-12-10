@@ -79,7 +79,12 @@ public class OmniX extends LinearOpMode {
   double[] trigL  = { 0 , 0 } ;
   double[] trigR  = { 0 , 0 } ;
 
-  final int MIN_THROTTLE = 16;
+
+
+
+  // minimum throttle for motors to have sufficient grip
+
+  final int MIN_THROTTLE = 1 / 16;
 
   double throttleCurve ( double[] array , degree ) {
 
@@ -103,7 +108,7 @@ public class OmniX extends LinearOpMode {
 
     double power = Math.pow    ( avg , 5 ) ;
 
-    return ( power + ( sign - power ) / MIN_THROTTLE ) ;
+    return ( power + MIN_THROTTLE * ( sign - power ) ) ;
 
   }
 
@@ -204,12 +209,12 @@ public class OmniX extends LinearOpMode {
 
       driveFwd =   throttleCurve( stickY ) ;
 
-      driveRht = ( gamepad1.left_stick_button  || gamepad2.left_stick_button  ) ? (  1 / MIN_THROTTLE                                    )
-               : ( gamepad1.right_stick_button || gamepad2.right_stick_button ) ? ( -1 / MIN_THROTTLE                                    )
+      driveRht = ( gamepad1.left_stick_button  || gamepad2.left_stick_button  ) ? (  MIN_THROTTLE                                        )
+               : ( gamepad1.right_stick_button || gamepad2.right_stick_button ) ? ( -MIN_THROTTLE                                        )
                :                                                                  ( -throttleCurve( stickX )                             ) ;
 
-      driveC   = ( gamepad1.left_bumper        || gamepad2.left_bumper        ) ? (  1 / MIN_THROTTLE                                    )
-               : ( gamepad1.right_bumper       || gamepad2.right_bumper       ) ? ( -1 / MIN_THROTTLE                                    )
+      driveC   = ( gamepad1.left_bumper        || gamepad2.left_bumper        ) ? (  MIN_THROTTLE                                        )
+               : ( gamepad1.right_bumper       || gamepad2.right_bumper       ) ? ( -MIN_THROTTLE                                        )
                :                                                                  (  throttleCurve ( trigL  ) - throttleCurve ( trigR  ) ) ;
 
 
