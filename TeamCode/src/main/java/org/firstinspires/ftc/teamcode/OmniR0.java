@@ -17,9 +17,39 @@ import java.util.Locale;
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="OmniR0", group="Linear Opmode")
 //@Disabled
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 public class OmniR0 extends LinearOpMode {
 
+
+
+
+
+
+
+
+
   boolean isRed = true; //IMPORTANT
+
+
 
   private ElapsedTime runtime = new ElapsedTime();
 
@@ -37,6 +67,8 @@ public class OmniR0 extends LinearOpMode {
   private DistanceSensor  senseDistX   = null;
   private DistanceSensor  senseDistS   = null;
 
+
+
   double distN = 30;
   double distX = 0;
   double distS = 100;
@@ -44,34 +76,46 @@ public class OmniR0 extends LinearOpMode {
   double time = 0;
 
 
-  static double DIST_WALL                 = 5;
 
-  static double DIST_Y_SKYBRIDGE          = 60;
+  final double DIST_WALL                 = 5;
 
-  static double DIST_X_INTRACK_OUTER      = 25;
+  final double DIST_Y_SKYBRIDGE          = 60;
 
-  static double DIST_X_DEPOT_CENTER       = 45;
-  static double DIST_X_DEPOT_OUTER        =-10 + DIST_X_DEPOT_CENTER;
+  final double DIST_X_INTRACK_OUTER      = 25;
 
-  static double DIST_X_FOUNDATION_CENTER  = 35;
+  final double DIST_X_DEPOT_CENTER       = 45;
+  final double DIST_X_DEPOT_OUTER        =-10 + DIST_X_DEPOT_CENTER;
 
-  static double DIST_Y_FOUNDATION_CENTER  = 15;
-  static double DIST_Y_FOUNDATION_OUTER   = 35 + DIST_Y_FOUNDATION_CENTER;
+  final double DIST_X_FOUNDATION_CENTER  = 35;
 
-  static double LUMIN_THRESHOLD           = 400;
+  final double DIST_Y_FOUNDATION_CENTER  = 15;
+  final double DIST_Y_FOUNDATION_OUTER   = 35 + DIST_Y_FOUNDATION_CENTER;
+
+  final double LUMIN_THRESHOLD           = 400;
 
 
-  static int optLuminG =  0;
-  static int optDistNL = -1;
-  static int optDistNG =  1;
-  static int optDistXL = -2;
-  static int optDistXG =  2;
-  static int optDistSL = -3;
-  static int optDistSG =  3;
-  static int optTimeL  = -4;
+
+  final int optLuminG =  0;
+
+  final int optDistNL = -1;
+  final int optDistNG =  1;
+  final int optDistXL = -2;
+  final int optDistXG =  2;
+  final int optDistSL = -3;
+  final int optDistSG =  3;
+
+  final int optTimeL  = -4;
+
 
 
   boolean shouldGrab = false;
+
+
+
+
+
+
+
 
   private void driveX(double force){
 
@@ -88,6 +132,8 @@ public class OmniR0 extends LinearOpMode {
 
   }
 
+
+
   private void driveY(double force){
 
     // drive toward stones
@@ -98,6 +144,8 @@ public class OmniR0 extends LinearOpMode {
     driveSW.setPower(-force);
 
   }
+
+
 
   private void driveSpn(double force){
 
@@ -114,11 +162,15 @@ public class OmniR0 extends LinearOpMode {
 
   }
 
+
+
   private void sliderSpn(double force){
 
     slider.setPower(force);
 
   }
+
+
 
   private void grab(){
 
@@ -129,6 +181,21 @@ public class OmniR0 extends LinearOpMode {
     }
 
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   private void update(){
 
@@ -148,6 +215,7 @@ public class OmniR0 extends LinearOpMode {
     telemetry.update();
 
   }
+
 
   private void runWhile(int option, double comparator){
 
@@ -212,22 +280,45 @@ public class OmniR0 extends LinearOpMode {
 
   }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   @Override
   public void runOpMode() {
+
+
 
     driveNW    = hardwareMap.get( DcMotor.class,       "driveNW" );
     driveNE    = hardwareMap.get( DcMotor.class,       "driveNE" );
     driveSE    = hardwareMap.get( DcMotor.class,       "driveSE" );
     driveSW    = hardwareMap.get( DcMotor.class,       "driveSW" );
+
     slider     = hardwareMap.get( DcMotor.class,       "slider"  );
     grabber    = hardwareMap.get( Servo.class  ,       "grabber" );
+
     senseColor = hardwareMap.get(ColorSensor.class,    "color"   );
     senseDistN = hardwareMap.get(DistanceSensor.class, "distN"   );
     senseDistX = hardwareMap.get(DistanceSensor.class, "distX"   );
     senseDistS = hardwareMap.get(DistanceSensor.class, "distS"   );
 
+
+
     waitForStart();
     runtime.reset();
+
 
 
     driveX(0.5); //drive sideways to within 5in of depot
@@ -258,11 +349,12 @@ public class OmniR0 extends LinearOpMode {
     driveX(-0.5);
     runWhile(optDistXG, DIST_X_INTRACK_OUTER);
 
+
+
     //drive back until centered on foundation's long side
     driveY(-0.5);
     runWhile(optDistSG, DIST_Y_FOUNDATION_CENTER);
     driveY(0);
-
 
     //deploy foundation grabber
     //
@@ -325,5 +417,10 @@ public class OmniR0 extends LinearOpMode {
 
     driveX(0);
 
+
+
   }
+
+
+
 }

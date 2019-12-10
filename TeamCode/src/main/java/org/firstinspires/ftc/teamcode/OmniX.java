@@ -43,20 +43,19 @@ public class OmniX extends LinearOpMode {
   double[] trigR   = {0,0};
 
 
-  static int STEP  = 16;
-  double normalize = 1;
+  final int STEP   = 16;
 
   double driveRht  = 0;
   double driveFwd  = 0;
   double driveC    = 0;
-
+  double normalize = 1;
 
   double sliderPower  = 0;
   double grabberPos   = 0.7;
 
 
 
-  static double inputCurve( double[] array ) {
+  double inputCurve( double[] array ) {
 
 
 
@@ -132,7 +131,9 @@ public class OmniX extends LinearOpMode {
 
         telemetry.addData( "Status    " , "OmniX Panic"    );
 
-        //lock
+
+
+        //lock motors
 
         driveNW.setPower(  1 );
         driveNE.setPower( -1 );
@@ -154,6 +155,7 @@ public class OmniX extends LinearOpMode {
         driveSW.setPower( 0 );
 
         sleep(3000);
+
 
 
 
