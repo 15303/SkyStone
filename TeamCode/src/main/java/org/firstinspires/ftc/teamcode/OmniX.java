@@ -101,9 +101,9 @@ public class OmniX extends LinearOpMode {
 
     double sign  = Math.signum ( avg     ) ;
 
-    double power = Math.pow    ( avg , 2 ) ;
+    double power = Math.pow    ( avg , 3 ) ;
 
-    return ( ( Math.round( STEP * sign * power ) + sign ) / STEP ) ;
+    return ( ( Math.round( STEP * power ) + sign ) / STEP ) ;
 
   }
 
