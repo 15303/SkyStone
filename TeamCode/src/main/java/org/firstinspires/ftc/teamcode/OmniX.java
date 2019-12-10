@@ -60,21 +60,23 @@ public class OmniX extends LinearOpMode {
 
 
 
-    double sum = 0;
+    double sum   = 0;
 
     for( int i = 0; i < array.length; i++ ){
+
       sum += array[i];
+
     }
 
-    double avg = 2*sum/array.length;
+    double avg   = 2 * sum / array.length;
 
     if( Math.abs(avg) < 0.1 ){
       return 0;
     }
 
-    double sign = Math.signum(avg);
+    double sign  = Math.signum( avg );
 
-    double power = Math.pow(avg,2);
+    double power = Math.pow( avg , 2 );
 
     return ( ( Math.round( STEP * sign * power ) + sign ) / STEP );
 
@@ -95,13 +97,12 @@ public class OmniX extends LinearOpMode {
 
 
 
-
   @Override
   public void runOpMode() {
 
 
 
-    telemetry.addData( "Status    " , "X Initialized" );
+    telemetry.addData( "Status    " , "OmniX Initialized" );
     telemetry.update();
 
 
@@ -129,7 +130,7 @@ public class OmniX extends LinearOpMode {
 
 
 
-        telemetry.addData( "Status    " , "X Panic"    );
+        telemetry.addData( "Status    " , "OmniX Panic"    );
 
         //lock
 
@@ -160,14 +161,16 @@ public class OmniX extends LinearOpMode {
 
 
 
-        telemetry.addData( "Status     " , "X Running" );
+
+        telemetry.addData( "Status     " , "OmniX Running" );
+
 
 
 
         //driving define
 
-        stickX  = new double[]{ gamepad1.left_stick_x,  gamepad2.left_stick_x, gamepad1.right_stick_x, gamepad2.right_stick_x };
-        stickY  = new double[]{ gamepad1.left_stick_y,  gamepad2.left_stick_y, gamepad1.right_stick_y, gamepad2.right_stick_y };
+        stickX  = new double[]{ gamepad1.left_stick_x,  gamepad2.left_stick_x,  gamepad1.right_stick_x,  gamepad2.right_stick_x };
+        stickY  = new double[]{ gamepad1.left_stick_y,  gamepad2.left_stick_y,  gamepad1.right_stick_y,  gamepad2.right_stick_y };
         trigL   = new double[]{ gamepad1.left_trigger,  gamepad2.left_trigger  };
         trigR   = new double[]{ gamepad1.right_trigger, gamepad2.right_trigger };
 
@@ -183,7 +186,7 @@ public class OmniX extends LinearOpMode {
                  :                                                      ( inputCurve( trigL ) - inputCurve( trigR ) );
 
 
-        normalize = Math.max ( Math.abs(driveRht) + Math.abs(driveFwd) + Math.abs(driveC) , 1)
+        normalize = Math.max ( Math.abs(driveRht) + Math.abs(driveFwd) + Math.abs(driveC) , 1);
 
 
         //driving do
@@ -192,6 +195,7 @@ public class OmniX extends LinearOpMode {
         driveNE.setPower( (   driveRht - driveFwd + driveC ) / normalize );
         driveSE.setPower( ( - driveRht - driveFwd + driveC ) / normalize );
         driveSW.setPower( ( - driveRht + driveFwd + driveC ) / normalize );
+
 
 
 
@@ -211,6 +215,7 @@ public class OmniX extends LinearOpMode {
 
         slider.setPower(sliderPower);
         grabber.setPosition(grabberPos);
+
 
 
 
