@@ -79,7 +79,7 @@ public class OmniX extends LinearOpMode {
   double[] trigL   = { 0 , 0 } ;
   double[] trigR   = { 0 , 0 } ;
 
-  final int STEP   = 16;
+  final int MIN_THROTTLE = 16;
 
   double throttleCurve ( double[] array ) {
 
@@ -91,19 +91,19 @@ public class OmniX extends LinearOpMode {
 
     }
 
-    double avg   = 2 * sum / array.length;
-
-    if ( Math.abs( avg ) < 0.1 ) {
+    if ( avg > 1 / MIN_THROTTLE ) {
 
       return 0;
 
     }
 
+    double avg   = 2 * sum / array.length;
+
     double sign  = Math.signum ( avg     ) ;
 
     double power = Math.pow    ( avg , 3 ) ;
 
-    return ( ( Math.round( STEP * power ) + sign ) / STEP ) ;
+    return ( power + ( sign - power ) / MIN_THROTTLE ) ;
 
   }
 
@@ -204,12 +204,12 @@ public class OmniX extends LinearOpMode {
 
       driveFwd =   throttleCurve( stickY ) ;
 
-      driveRht = ( gamepad1.left_stick_button  || gamepad2.left_stick_button  ) ? (  1/STEP                                          )
-               : ( gamepad1.right_stick_button || gamepad2.right_stick_button ) ? ( -1/STEP                                          )
+      driveRht = ( gamepad1.left_stick_button  || gamepad2.left_stick_button  ) ? (  1/MIN_THROTTLE                                  )
+               : ( gamepad1.right_stick_button || gamepad2.right_stick_button ) ? ( -1/MIN_THROTTLE                                  )
                :                                                                  ( - throttleCurve( stickX )                        ) ;
 
-      driveC   = ( gamepad1.left_bumper        || gamepad2.left_bumper        ) ? (  1/STEP                                          )
-               : ( gamepad1.right_bumper       || gamepad2.right_bumper       ) ? ( -1/STEP                                          )
+      driveC   = ( gamepad1.left_bumper        || gamepad2.left_bumper        ) ? (  1/MIN_THROTTLE                                  )
+               : ( gamepad1.right_bumper       || gamepad2.right_bumper       ) ? ( -1/MIN_THROTTLE                                  )
                :                                                                  (  throttleCurve( trigL ) - throttleCurve( trigR ) ) ;
 
 
