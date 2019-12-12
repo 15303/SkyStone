@@ -76,8 +76,8 @@ public class OmniX extends LinearOpMode {
 
   double[] stickX = { 0 , 0 , 0 , 0 } ;
   double[] stickY = { 0 , 0 , 0 , 0 } ;
-  double[] trigL  = { 0 , 0 } ;
-  double[] trigR  = { 0 , 0 } ;
+  double[] trigL  = { 0 , 0         } ;
+  double[] trigR  = { 0 , 0         } ;
 
 
 
@@ -86,21 +86,21 @@ public class OmniX extends LinearOpMode {
 
   final int MIN_THROTTLE = 1 / 16;
 
-  double throttleCurve ( double[] array , degree ) {
+  double throttleCurve ( double[] inputs , degree ) {
 
-    double sum   = 0;
+    double sum = 0;
 
-    for ( int i = 0; i < array.length; i++ ) {
+    for ( int i = 0 ; i < inputs.length ; i++ ) {
 
-      sum += array[i];
+      sum += inputs[i] ;
 
     }
 
-    double avg   = 2 * sum / array.length ;
+    final double avg   = 2 * sum / inputs.length  ;
 
-    double abs   = Math.abs    ( avg     ) ;
-    double sign  = Math.signum ( avg     ) ;
-    double power = Math.pow    ( avg , 5 ) ;
+    final double abs   = Math.abs    ( avg     ) ;
+    final double sign  = Math.signum ( avg     ) ;
+    final double power = Math.pow    ( avg , 5 ) ;
 
     return ( abs < MIN_THROTTLE ) ? 0
                                   : ( power + MIN_THROTTLE * ( sign - power ) ) ;
@@ -111,16 +111,16 @@ public class OmniX extends LinearOpMode {
 
 
 
-  double driveRht  = 0;
-  double driveFwd  = 0;
-  double driveC    = 0;
-  double normalize = 1;
+  double driveRht  = 0 ;
+  double driveFwd  = 0 ;
+  double driveC    = 0 ;
+  double normalize = 1 ;
 
 
 
 
-  double sliderPower = 0;
-  double grabberPos  = 0.7;
+  double sliderPower = 0   ;
+  double grabberPos  = 0.7 ;
 
 
 
@@ -203,11 +203,11 @@ public class OmniX extends LinearOpMode {
 
 
 
-      driveFwd =   throttleCurve( stickY ) ;
+      driveFwd =   throttleCurve ( stickY ) ;
 
       driveRht = ( gamepad1.left_stick_button  || gamepad2.left_stick_button  ) ? (  MIN_THROTTLE                                        )
                : ( gamepad1.right_stick_button || gamepad2.right_stick_button ) ? ( -MIN_THROTTLE                                        )
-               :                                                                  ( -throttleCurve( stickX )                             ) ;
+               :                                                                  ( -throttleCurve ( stickX )                            ) ;
 
       driveC   = ( gamepad1.left_bumper        || gamepad2.left_bumper        ) ? (  MIN_THROTTLE                                        )
                : ( gamepad1.right_bumper       || gamepad2.right_bumper       ) ? ( -MIN_THROTTLE                                        )
@@ -248,8 +248,8 @@ public class OmniX extends LinearOpMode {
                   :                                                   0          ;
 
 
-      grabberPos  = ( gamepad1.dpad_up     || gamepad2.dpad_up   ) ?  0
-                  : ( gamepad1.dpad_down   || gamepad2.dpad_down ) ?  0.7
+      grabberPos  = ( gamepad1.dpad_up    || gamepad2.dpad_up    ) ?  0
+                  : ( gamepad1.dpad_down  || gamepad2.dpad_down  ) ?  0.7
                   :                                                   grabberPos ;
 
 
