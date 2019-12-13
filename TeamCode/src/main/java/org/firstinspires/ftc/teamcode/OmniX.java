@@ -86,7 +86,7 @@ public class OmniX extends LinearOpMode {
 
   final int MIN_THROTTLE = 1 / 16;
 
-  double throttleCurve ( double[] inputs , degree ) {
+  double throttleCurve ( double[] inputs ) {
 
     double sum = 0;
 

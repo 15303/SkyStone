@@ -301,9 +301,9 @@ public class OmniR1 extends LinearOpMode {
 
   }
 
-  private void runFor ( double milliseconds ) {
+  private void runFor ( int milliseconds ) {
 
-    runwhile ( OPT_TIME_L , milliseconds + getRuntime () ) ;
+    runWhile ( OPT_TIME_L , milliseconds + (int)getRuntime() ) ;
 
   }
 
@@ -327,31 +327,28 @@ public class OmniR1 extends LinearOpMode {
   public void runOpMode () {
 
 
+    driveNW = hardwareMap.get(DcMotor.class, "driveNW");
+    driveNE = hardwareMap.get(DcMotor.class, "driveNE");
+    driveSE = hardwareMap.get(DcMotor.class, "driveSE");
+    driveSW = hardwareMap.get(DcMotor.class, "driveSW");
 
-    driveNW    = hardwareMap.get ( DcMotor.class ,       "driveNW" ) ;
-    driveNE    = hardwareMap.get ( DcMotor.class ,       "driveNE" ) ;
-    driveSE    = hardwareMap.get ( DcMotor.class ,       "driveSE" ) ;
-    driveSW    = hardwareMap.get ( DcMotor.class ,       "driveSW" ) ;
+    slider = hardwareMap.get(DcMotor.class, "slider");
+    grabber = hardwareMap.get(Servo.class, "grabber");
 
-    slider     = hardwareMap.get ( DcMotor.class ,       "slider"  ) ;
-    grabber    = hardwareMap.get ( Servo.class  ,        "grabber" ) ;
-
-    senseColor = hardwareMap.get ( ColorSensor.class ,    "color"   ) ;
-    senseDistN = hardwareMap.get ( DistanceSensor.class , "distN"   ) ;
-    senseDistX = hardwareMap.get ( DistanceSensor.class , "distX"   ) ;
-    senseDistS = hardwareMap.get ( DistanceSensor.class , "distS"   ) ;
-
+    senseColor = hardwareMap.get(ColorSensor.class, "color");
+    senseDistN = hardwareMap.get(DistanceSensor.class, "distN");
+    senseDistX = hardwareMap.get(DistanceSensor.class, "distX");
+    senseDistS = hardwareMap.get(DistanceSensor.class, "distS");
 
 
-    waitForStart() ;
-    runtime.reset() ;
-
+    waitForStart();
+    runtime.reset();
 
 
     // drive sideways to contact foundation
 
-    driveX    ( CAUTIOUS_POWER                        ) ;
-    runwhile  ( OPT_DIST_XL , DIST_X_FOUNDATION_OUTER ) ;
+    driveX(CAUTIOUS_POWER);
+    runWhile(OPT_DIST_XL, DIST_X_FOUNDATION_OUTER);
 
 
     // grab foundation
@@ -359,12 +356,13 @@ public class OmniR1 extends LinearOpMode {
 
     // drive sideways to wall while pulling foundation
 
-    driveX    (-CAUTIOUS_POWER                        ) ;
-    runwhile  ( OPT_DIST_XG , DIST_X_WALL             ) ;
+    driveX(-CAUTIOUS_POWER);
+    runWhile(OPT_DIST_XG, DIST_X_WALL);
 
     // park under skybridge (outer lane)
 
-    driveY    ( FULL_POWER                            ) ;
-    runwhile  ( OPT_DIST_SL , DIST_Y_SKYBRIDGE        ) ;
+    driveY(FULL_POWER);
+    runWhile(OPT_DIST_SL, DIST_Y_SKYBRIDGE);
 
+  }
 }
