@@ -1,139 +1,32 @@
 package org.firstinspires.ftc.teamcode;
-
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.Range;
-
-@TeleOp (
-
-  name  = "OmniX"         ,
-  group = "Linear Opmode"
-
-)
-
-//@Disabled
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-public class OmniX extends LinearOpMode {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+@Disabled
+@TeleOp(name="OmniX",group="Linear Opmode") public class OmniX_condensed extends LinearOpMode {
   private DcMotor driveNW = null;
   private DcMotor driveNE = null;
   private DcMotor driveSE = null;
   private DcMotor driveSW = null;
-
   private DcMotor slider  = null;
   private Servo   grabber = null;
-  private Servo   dragger = null ;
-
-
-
-
-
-  double stickXL = 0 ;
-  double stickXR = 0 ;
-  double stickYL = 0 ;
-  double stickYR = 0 ;
-  double trigL   = 0 ;
-  double trigR   = 0 ;
-
-
-
-
-  // minimum throttle for motors to have sufficient grip
-
-
-
-
-
-  double driveRht  = 0 ;
-  double driveFwd  = 0 ;
-  double driveC    = 0 ;
-  double normalize = 1 ;
-
-
-
-
-  double sliderPower = 0   ;
-  double grabberPos  = 0.7 ;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  @Override
-  public void runOpMode() {
-
-
-
-    telemetry.addData ( "Status    " , "OmniX Initialized" ) ;
-    telemetry.update  (                                    ) ;
-
-
-
+  double stickXL=0;
+  double stickXR=0;
+  double stickYL=0;
+  double stickYR=0;
+  double trigL=0;
+  double trigR=0;
+  double driveRht=0;
+  double driveFwd=0;
+  double driveC=0;
+  double normalize=1;
+  double sliderPower=0;
+  double grabberPos=0.7;
+  @Override public void runOpMode() {
+    telemetry.addData("Status    ","OmniX Initialized");
+    telemetry.update();
     driveNW = hardwareMap.get ( DcMotor.class , "driveNW" ) ;
     driveNE = hardwareMap.get ( DcMotor.class , "driveNE" ) ;
     driveSE = hardwareMap.get ( DcMotor.class , "driveSE" ) ;
@@ -141,8 +34,6 @@ public class OmniX extends LinearOpMode {
 
     slider  = hardwareMap.get ( DcMotor.class , "slider"  ) ;
     grabber = hardwareMap.get ( Servo.class   , "grabber" ) ;
-    dragger = hardwareMap.get ( Servo.class   , "dragger" ) ;
-
 
 
 

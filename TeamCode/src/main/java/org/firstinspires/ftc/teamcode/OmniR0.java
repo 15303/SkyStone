@@ -38,6 +38,7 @@ public class OmniR0 extends LinearOpMode {
 
   private DcMotor         slider  = null ;
   private Servo           grabber = null ;
+  private Servo           dragger = null ;
 
   private ColorSensor     senseColor   = null ;
 
@@ -49,41 +50,41 @@ public class OmniR0 extends LinearOpMode {
   double distN =  30 ;
   double distX =   0 ;
   double distS = 100 ;
-  double lumin = 100 ;
+  double lumin = 800 ;
   double time  =   0 ;
 
 
   // power
 
-  final double CAUTIOUS_POWER         =    0.5 ;
-  final double NORMAL_POWER           =    0.7 ;
+  final double CAUTIOUS_POWER         =    0.3 ;
+  final double NORMAL_POWER           =    0.5 ;
   final double FULL_POWER             =    1   ;
 
 
 
   // inches
 
-  final int DIST_X_WALL               =    5 ;
-  final int DIST_Y_WALL               =    2 ;
+  final int DIST_X_WALL               =   10 ;
+  final int DIST_Y_WALL               =    5 ;
 
   final int DIST_Y_SKYBRIDGE          =   60 ;
 
-  final int DIST_X_INTRACK_OUTER      =   25 ;
+  final int DIST_X_INTRACK_OUTER      =   30 ;
 
-  final int DIST_X_DEPOT_CENTER       =   45 ;
-  final int DIST_X_DEPOT_OUTER        =  -10 + DIST_X_DEPOT_CENTER ;
+  final int DIST_X_DEPOT_CENTER       =   40 ;
+  final int DIST_X_DEPOT_OUTER        =   -8 + DIST_X_DEPOT_CENTER ;
 
   final int DIST_X_FOUNDATION_CENTER  =   45 ;
-  final int DIST_X_FOUNDATION_OUTER   =  -15 + DIST_X_FOUNDATION_CENTER ;
+  final int DIST_X_FOUNDATION_OUTER   =   -10 + DIST_X_FOUNDATION_CENTER ;
 
-  final int DIST_Y_FOUNDATION_CENTER  =   15 ;
-  final int DIST_Y_FOUNDATION_OUTER   =   35 + DIST_Y_FOUNDATION_CENTER ;
+  final int DIST_Y_FOUNDATION_CENTER  =   30 ;
+  final int DIST_Y_FOUNDATION_OUTER   =   15 + DIST_Y_FOUNDATION_CENTER ;
 
 
 
   // RGB sum
 
-  final int LUMIN_THRESHOLD           =  400 ;
+  final int LUMIN_THRESHOLD           =  210 ;
 
 
 
@@ -93,7 +94,7 @@ public class OmniR0 extends LinearOpMode {
   final int TIME_ONE_LEVEL            =  700 ;
   final int TIME_STONE_MARGIN         =  500 ;
   final int TIME_FOUNDATION_MARGIN    =  500 ;
-  final int TIME_TOGGLE_GRABBER       = 1000 ;
+  final int TIME_TOGGLE_DRABBER       = 1000 ;
 
 
 
@@ -113,6 +114,7 @@ public class OmniR0 extends LinearOpMode {
 
 
   boolean shouldGrab = false ;
+  boolean shouldDrag = false ;
 
 
   private void driveX ( double power ) {
@@ -125,7 +127,7 @@ public class OmniR0 extends LinearOpMode {
 
     }
 
-    driveNW.setPower (  power ) ;
+    driveNW.setPower (  power*0.84 ) ;
     driveNE.setPower (  power ) ;
     driveSE.setPower ( -power ) ;
     driveSW.setPower ( -power ) ;
@@ -170,7 +172,7 @@ public class OmniR0 extends LinearOpMode {
   }
 
 
-  private void grab () {
+  private void drab () {
 
     if ( shouldGrab ) {
 
@@ -182,19 +184,29 @@ public class OmniR0 extends LinearOpMode {
 
     }
 
+    if ( shouldDrag ) {
+
+      dragger.setPosition ( 0.7 ) ;
+
+    } else {
+
+      dragger.setPosition ( 0   ) ;
+
+    }
+
   }
 
 
   private void update () {
 
-    grab () ;
+    drab () ;
 
-    time  = getRuntime () ;
+    time  = getRuntime () * 1000 ;
 
     distN = ( distN + senseDistN.getDistance ( DistanceUnit.INCH )                 ) / 2 ;
     distX = ( distX + senseDistX.getDistance ( DistanceUnit.INCH )                 ) / 2 ;
     distS = ( distS + senseDistS.getDistance ( DistanceUnit.INCH )                 ) / 2 ;
-    lumin = ( lumin + senseColor.red () + senseColor.green () + senseColor.blue () ) / 2 ;
+    lumin = ( lumin + Math.max( senseColor.red () , Math.max ( senseColor.green () , senseColor.blue () ) ) ) / 2 ;
 
     telemetry.addData ( "distN" , distN ) ;
     telemetry.addData ( "distX" , distX ) ;
@@ -248,7 +260,7 @@ public class OmniR0 extends LinearOpMode {
 
   private void runFor ( int milliseconds ) {
 
-    runWhile ( OPT_TIME_L , milliseconds + (int)getRuntime () ) ;
+    runWhile ( OPT_TIME_L , milliseconds + (int)time ) ;
 
   }
 
@@ -264,7 +276,8 @@ public class OmniR0 extends LinearOpMode {
     driveSW    = hardwareMap.get ( DcMotor.class ,       "driveSW" ) ;
 
     slider     = hardwareMap.get ( DcMotor.class ,       "slider"  ) ;
-    grabber    = hardwareMap.get ( Servo.class  ,        "grabber" ) ;
+    grabber    = hardwareMap.get ( Servo.class   ,       "grabber" ) ;
+    dragger    = hardwareMap.get ( Servo.class   ,       "dragger" ) ;
 
     senseColor = hardwareMap.get ( ColorSensor.class ,    "color"   ) ;
     senseDistN = hardwareMap.get ( DistanceSensor.class , "distN"   ) ;
@@ -278,7 +291,7 @@ public class OmniR0 extends LinearOpMode {
 
     // drive sideways to within 5in of depot
 
-    driveX    ( CAUTIOUS_POWER                        ) ;
+    driveX    ( NORMAL_POWER                          ) ;
     runWhile  ( OPT_DIST_XL , DIST_X_DEPOT_OUTER      ) ;
 
 
@@ -292,18 +305,18 @@ public class OmniR0 extends LinearOpMode {
     // drive back for .2s
 
     driveY    (-CAUTIOUS_POWER                        ) ;
-    runFor    ( TIME_STONE_MARGIN                     ) ;
+    runFor    ( TIME_STONE_MARGIN+500                     ) ;
 
 
-    // drive si😌deways to stone depot
+    // drive sideways to stone depot
 
-    driveX    ( CAUTIOUS_POWER                        ) ;
+    driveX    ( FULL_POWER                          ) ;
     runWhile  ( OPT_DIST_XL , DIST_X_DEPOT_CENTER     ) ;
 
 
     // drive forward for .2s
 
-    driveY    ( CAUTIOUS_POWER                        ) ;
+    driveY    ( FULL_POWER                        ) ;
     runFor    ( TIME_STONE_MARGIN                     ) ;
 
 
@@ -314,7 +327,7 @@ public class OmniR0 extends LinearOpMode {
 
     // wait 1s for grabber to close
 
-    runFor    ( TIME_TOGGLE_GRABBER                   ) ;
+    runFor    ( TIME_TOGGLE_DRABBER                   ) ;
 
 
     // drive sideways to inner track
@@ -332,10 +345,20 @@ public class OmniR0 extends LinearOpMode {
     // drive sideways until touching foundation
 
     driveX    ( NORMAL_POWER                          ) ;
-    runWhile  ( OPT_DIST_XG , DIST_X_FOUNDATION_OUTER ) ;
+    runWhile  ( OPT_DIST_XL , DIST_X_FOUNDATION_OUTER ) ;
+
+
+    driveY    (-NORMAL_POWER);
+    runWhile( OPT_DIST_SG , DIST_Y_WALL);
 
 
     // deploy foundation grabber
+
+    shouldDrag = true ;
+    runFor    ( TIME_TOGGLE_DRABBER                   ) ;
+
+
+
     //
 
     // drive sideways until touching wall
@@ -345,6 +368,9 @@ public class OmniR0 extends LinearOpMode {
 
 
     // release foundation grabber
+
+    shouldDrag = false ;
+
     //
 
 
