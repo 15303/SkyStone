@@ -15,7 +15,7 @@ import java.util.Locale ;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous (
 
-  name  = "OmniR0"         ,
+  name  = "OmniR1"         ,
   group = "Linear Opmode"
 
 )
@@ -43,7 +43,7 @@ import java.util.Locale ;
 
 
 
-public class OmniR0 extends LinearOpMode {
+public class OmniR1 extends LinearOpMode {
 
 
 
@@ -348,148 +348,23 @@ public class OmniR0 extends LinearOpMode {
 
 
 
-    // drive sideways to within 5in of depot
+    // drive sideways to contact foundation
 
     driveX    ( CAUTIOUS_POWER                        ) ;
-    runwhile  ( OPT_DIST_XL , DIST_X_DEPOT_OUTER      ) ;
+    runwhile  ( OPT_DIST_XL , DIST_X_FOUNDATION_OUTER ) ;
 
 
-
-    // drive forwards until skystone
-
-    driveY    ( CAUTIOUS_POWER                        ) ;
-    runwhile  ( OPT_LUMIN_G , LUMIN_THRESHOLD         ) ;
+    // grab foundation
 
 
-    // drive back for .2s
+    // drive sideways to wall while pulling foundation
 
-    driveY    (-CAUTIOUS_POWER                        ) ;
-    runFor    ( TIME_STONE_MARGIN                     ) ;
-
-
-    // drive sideways to stone depot
-
-    driveX    ( CAUTIOUS_POWER                        ) ;
-    runwhile  ( OPT_DIST_XL , DIST_X_DEPOT_CENTER     ) ;
-
-
-    // drive forward for .2s
-
-    driveY    ( CAUTIOUS_POWER                        ) ;
-    runFor    ( TIME_STONE_MARGIN                     ) ;
-
-
-    // grab
-
-    shouldGrab = true ;
-
-
-    // wait 1s for grabber to close
-
-    runFor    ( TIME_TOGGLE_GRABBER                   ) ;
-
-
-    // drive sideways to inner track
-
-    driveX    (-NORMAL_POWER                          ) ;
-    runwhile  ( OPT_DIST_XG , DIST_X_INTRACK_OUTER    ) ;
-
-
-    // drive back until centered on foundation's long side
-
-    driveY    (-FULL_POWER                            ) ;
-    runwhile  ( OPT_DIST_SG , DIST_Y_FOUNDATION_CENTER) ;
-
-
-    // drive sideways until touching foundation
-
-    driveX    ( NORMAL_POWER                          ) ;
-    runwhile  ( OPT_DIST_XG , DIST_X_FOUNDATION_OUTER ) ;
-
-
-    // deploy foundation grabber
-    //
-
-    // drive sideways until touching wall
-
-    driveX    (-FULL_POWER                            ) ;
+    driveX    (-CAUTIOUS_POWER                        ) ;
     runwhile  ( OPT_DIST_XG , DIST_X_WALL             ) ;
 
-
-    // release foundation grabber
-    //
-
-
-    // drive forward until clear of foundation
-
-    driveY    ( NORMAL_POWER ) ;
-    runwhile  ( OPT_DIST_SL , DIST_Y_FOUNDATION_OUTER ) ;
-
-
-    // drive sideways until centered on foundation's short side
-
-    driveX    ( NORMAL_POWER ) ;
-    runwhile  ( OPT_DIST_XL , DIST_X_FOUNDATION_CENTER) ;
-
-
-    // turn 180deg
-
-    driveSpn  ( FULL_POWER                            ) ;
-    runFor    ( TIME_ONE_TURN                         ) ;
-
-
-    // raise slider
-
-    sliderSpn ( FULL_POWER                            ) ;
-    runFor    ( TIME_ONE_LEVEL                        ) ;
-
-
-    // drive "forward" until touching foundation's short side
-
-    driveY    ( CAUTIOUS_POWER                        ) ;
-    runFor    ( TIME_FOUNDATION_MARGIN                ) ;
-
-
-    // release
-
-    shouldGrab = false ;
-
-
-    // drive "backward"
-
-    driveY    (-NORMAL_POWER                          ) ;
-    runFor    ( TIME_FOUNDATION_MARGIN                ) ;
-
-    shouldGrab = true ;
-
-
-    // lower slider
-
-    sliderSpn (-FULL_POWER                            ) ;
-    runFor    ( TIME_ONE_LEVEL                        ) ;
-
-
-    // turn 180deg
-
-    driveSpn  (-FULL_POWER                            ) ;
-    runFor    ( TIME_ONE_TURN                         ) ;
-
-
-    // drive sideways to inner track
-
-    driveX    (-NORMAL_POWER                          ) ;
-    runwhile  ( OPT_DIST_XG , DIST_X_INTRACK_OUTER    ) ;
-
-
-    // drive forward to under bridge
+    // park under skybridge (outer lane)
 
     driveY    ( FULL_POWER                            ) ;
     runwhile  ( OPT_DIST_SL , DIST_Y_SKYBRIDGE        ) ;
-
-
-
-  }
-
-
 
 }
