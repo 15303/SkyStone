@@ -74,39 +74,18 @@ public class OmniX extends LinearOpMode {
 
 
 
-  double[] stickX = { 0 , 0 , 0 , 0 } ;
-  double[] stickY = { 0 , 0 , 0 , 0 } ;
-  double[] trigL  = { 0 , 0         } ;
-  double[] trigR  = { 0 , 0         } ;
+  double stickXL = 0 ;
+  double stickXR = 0 ;
+  double stickYL = 0 ;
+  double stickYR = 0 ;
+  double trigL   = 0 ;
+  double trigR   = 0 ;
 
 
 
 
   // minimum throttle for motors to have sufficient grip
 
-  final int MIN_THROTTLE = 1 / 16;
-
-  double throttleCurve ( double[] inputs ) {
-
-    double sum = 0;
-
-    for ( int i = 0 ; i < inputs.length ; i++ ) {
-
-      sum += inputs[i] ;
-
-    }
-
-    final double avg   = 2 * sum / inputs.length  ;
-
-    final double abs   = Math.abs    ( avg     ) ;
-    final double sign  = Math.signum ( avg     ) ;
-    final double power = Math.pow    ( avg , 3 ) ;
-
-    return ( abs < MIN_THROTTLE ) ? 0
-                                  : ( power + MIN_THROTTLE * ( sign - power ) ) ;
-
-
-  }
 
 
 
@@ -196,22 +175,22 @@ public class OmniX extends LinearOpMode {
 
       //driving define
 
-      stickX = new double[] { gamepad1.left_stick_x , gamepad2.left_stick_x , gamepad1.right_stick_x , gamepad2.right_stick_x } ;
-      stickY = new double[] { gamepad1.left_stick_y , gamepad2.left_stick_y , gamepad1.right_stick_y , gamepad2.right_stick_y } ;
-      trigL  = new double[] { gamepad1.left_trigger , gamepad2.left_trigger                                                   } ;
-      trigR  = new double[] { gamepad1.right_trigger, gamepad2.right_trigger                                                  } ;
+      stickXL = gamepad1.left_stick_x  + gamepad2.left_stick_x  ;
+      stickXR = gamepad1.right_stick_x + gamepad2.right_stick_x ;
+
+      stickYL = gamepad1.left_stick_x  + gamepad2.left_stick_x  ;
+      stickYR = gamepad1.right_stick_x + gamepad2.right_stick_x ;
+
+      trigL   = gamepad1.left_trigger  + gamepad2.left_trigger  ;
+      trigR   = gamepad1.right_trigger + gamepad2.right_trigger ;
 
 
 
-      driveFwd =   throttleCurve ( stickY ) ;
+      driveFwd =   ( Math.pow( stickYL , 3 ) + Math.pow ( stickYR , 3 ) ) / 2 ;
 
-      driveRht = ( gamepad1.left_stick_button  || gamepad2.left_stick_button  ) ? (  MIN_THROTTLE                                        )
-               : ( gamepad1.right_stick_button || gamepad2.right_stick_button ) ? ( -MIN_THROTTLE                                        )
-               :                                                                  ( -throttleCurve ( stickX )                            ) ;
+      driveRht = - ( Math.pow( stickXL , 3 ) + Math.pow ( stickXR , 3 ) ) / 2 ;
 
-      driveC   = ( gamepad1.left_bumper        || gamepad2.left_bumper        ) ? (  MIN_THROTTLE                                        )
-               : ( gamepad1.right_bumper       || gamepad2.right_bumper       ) ? ( -MIN_THROTTLE                                        )
-               :                                                                  (  throttleCurve ( trigL  ) - throttleCurve ( trigR  ) ) ;
+      driveC   =  Math.pow (trigL ) - Math.pow ( trigR ) ;
 
 
       normalize = Math.max ( Math.abs ( driveRht ) + Math.abs ( driveFwd ) + Math.abs ( driveC ) , 1 ) ;
