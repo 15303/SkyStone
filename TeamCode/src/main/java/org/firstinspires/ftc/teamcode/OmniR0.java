@@ -295,7 +295,7 @@ public class OmniR0 extends LinearOpMode {
     runFor    ( TIME_STONE_MARGIN                     ) ;
 
 
-    // drive sideways to stone depot
+    // drive si😌deways to stone depot
 
     driveX    ( CAUTIOUS_POWER                        ) ;
     runWhile  ( OPT_DIST_XL , DIST_X_DEPOT_CENTER     ) ;

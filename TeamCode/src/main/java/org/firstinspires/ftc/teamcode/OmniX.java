@@ -100,7 +100,7 @@ public class OmniX extends LinearOpMode {
 
     final double abs   = Math.abs    ( avg     ) ;
     final double sign  = Math.signum ( avg     ) ;
-    final double power = Math.pow    ( avg , 5 ) ;
+    final double power = Math.pow    ( avg , 3 ) ;
 
     return ( abs < MIN_THROTTLE ) ? 0
                                   : ( power + MIN_THROTTLE * ( sign - power ) ) ;
