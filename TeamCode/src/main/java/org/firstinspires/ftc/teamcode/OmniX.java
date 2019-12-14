@@ -264,6 +264,7 @@ public class OmniX extends LinearOpMode {
       telemetry.addData ( "DriveC     " ,  driveC            ) ;
       telemetry.addData ( "SliderPower" ,  sliderPower       ) ;
       telemetry.addData ( "GrabberPos " ,  grabberPos        ) ;
+      telemetry.addData ( "Normalize  " ,  normalize         ) ;
       telemetry.update  (                                    ) ;
 
 
