@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -8,18 +10,33 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Func;
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+
+import java.util.Locale;
 
 @Autonomous (
 
-  name  = "2: OmniR0_C"         ,
+  name  = "OmniRdikj0_v2"         ,
   group = "Linear Opmode"
 
 )
 
 // @Disabled
 
-public class OmniR0_C extends LinearOpMode {=
+
+public class OmniR0_v2bbackgp extends LinearOpMode {
+
+
+  boolean isRed = true ; // IMPORTANT
+
 
   private ElapsedTime runtime = new ElapsedTime() ;
 
@@ -34,35 +51,125 @@ public class OmniR0_C extends LinearOpMode {=
 
   private ColorSensor     senseColor   = null ;
 
-  private boolean         red = true;
+  private DistanceSensor  senseDistN   = null ;
+  private DistanceSensor  senseDistX   = null ;
+  private DistanceSensor  senseDistS   = null ;
 
+  BNO055IMU imu;
+
+  Orientation angles;
+  Acceleration gravity;
+
+
+  double distN =  30 ;
+  double distX =   0 ;
+  double distS = 100 ;
   double lumin = 800 ;
-
-  private void da ( double power , int time) {
-
-    driveNW.setPower (  power ) ;
-    driveNE.setPower ( -power ) ;
-    driveSE.setPower ( -power ) ;
-    driveSW.setPower (  power ) ;
-
-    sleep(time);
-
-  }
+  double time  =   0 ;
 
 
-  private void db ( double power , int time) {
+  // power
 
-    driveNW.setPower (  power ) ;
+  final double CAUTIOUS_POWER         =    0.3 ;
+  final double NORMAL_POWER           =    0.5 ;
+  final double FULL_POWER             =    1   ;
+
+
+
+  // inches
+
+  final int DIST_X_WALL               =   10 ;
+  final int DIST_Y_WALL               =    5 ;
+
+  final int DIST_Y_SKYBRIDGE          =   60 ;
+
+  final int DIST_X_INTRACK_OUTER      =   30 ;
+
+  final int DIST_X_DEPOT_CENTER       =   40 ;
+  final int DIST_X_DEPOT_OUTER        =   -8 + DIST_X_DEPOT_CENTER ;
+
+  final int DIST_X_FOUNDATION_CENTER  =   45 ;
+  final int DIST_X_FOUNDATION_OUTER   =   -10 + DIST_X_FOUNDATION_CENTER ;
+
+  final int DIST_Y_FOUNDATION_CENTER  =   30 ;
+  final int DIST_Y_FOUNDATION_OUTER   =   15 + DIST_Y_FOUNDATION_CENTER ;
+
+
+
+  // RGB sum
+
+  final int LUMIN_THRESHOLD           =  210 ;
+
+
+
+  // milliseconds
+
+  final int TIME_ONE_TURN             =  700 ;
+  final int TIME_ONE_LEVEL            =  700 ;
+  final int TIME_STONE_MARGIN         =  500 ;
+  final int TIME_FOUNDATION_MARGIN    =  500 ;
+  final int TIME_TOGGLE_DRABBER       = 1000 ;
+
+
+
+
+
+  final int OPT_LUMIN_G =  0 ;
+
+  final int OPT_DIST_NL = -1 ;
+  final int OPT_DIST_NG =  1 ;
+  final int OPT_DIST_XL = -2 ;
+  final int OPT_DIST_XG =  2 ;
+  final int OPT_DIST_SL = -3 ;
+  final int OPT_DIST_SG =  3 ;
+
+  final int OPT_TIME_L  = -4 ;
+
+
+
+  boolean shouldGrab = false ;
+  boolean shouldDrag = false ;
+
+
+  private void driveX ( double power ) {
+
+    // drive away from drivers
+
+    if ( isRed ) {
+
+      power = -power ;
+
+    }
+
+    driveNW.setPower (  power*0.84 ) ;
     driveNE.setPower (  power ) ;
     driveSE.setPower ( -power ) ;
     driveSW.setPower ( -power ) ;
 
-    sleep(time);
+  }
+
+
+  private void driveY ( double power ) {
+
+    // drive toward stones
+
+    driveNW.setPower ( -power ) ;
+    driveNE.setPower (  power ) ;
+    driveSE.setPower (  power ) ;
+    driveSW.setPower ( -power ) ;
 
   }
 
 
-  private void dt ( double power , int time) {
+  private void driveSpn ( double power ) {
+
+    // spin clockwise red , cc blue
+
+    if( isRed ) {
+
+      power = -power ;
+
+    }
 
     driveNW.setPower (  power ) ;
     driveNE.setPower (  power ) ;
@@ -191,6 +298,19 @@ public class OmniR0_C extends LinearOpMode {=
     senseDistX = hardwareMap.get ( DistanceSensor.class , "distX"   ) ;
     senseDistS = hardwareMap.get ( DistanceSensor.class , "distS"   ) ;
 
+    BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+    parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+    parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+    parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+    parameters.loggingEnabled      = true;
+    parameters.loggingTag          = "IMU";
+    parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+
+    imu = hardwareMap.get(BNO055IMU.class, "imu");
+    imu.initialize(parameters);
+
+    imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
+
 
     waitForStart() ;
     runtime.reset() ;
@@ -212,7 +332,7 @@ public class OmniR0_C extends LinearOpMode {=
     // drive back for .2s
 
     driveY    (-CAUTIOUS_POWER                        ) ;
-    runFor    ( TIME_STONE_MARGIN+500                     ) ;
+    runFor    ( TIME_STONE_MARGIN+800                     ) ;
 
 
     // drive sideways to stone depot
@@ -346,5 +466,75 @@ public class OmniR0_C extends LinearOpMode {=
 
     driveY    ( FULL_POWER                            ) ;
     runWhile  ( OPT_DIST_SL , DIST_Y_SKYBRIDGE        ) ;
+  }
+  void composeTelemetry() {
+
+    // At the beginning of each telemetry update, grab a bunch of data
+    // from the IMU that we will then display in separate lines.
+    telemetry.addAction(new Runnable() { @Override public void run()
+    {
+      // Acquiring the angles is relatively expensive; we don't want
+      // to do that in each of the three items that need that info, as that's
+      // three times the necessary expense.
+      angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+      gravity  = imu.getGravity();
+    }
+    });
+
+    telemetry.addLine()
+            .addData("status", new Func<String>() {
+              @Override public String value() {
+                return imu.getSystemStatus().toShortString();
+              }
+            })
+            .addData("calib", new Func<String>() {
+              @Override public String value() {
+                return imu.getCalibrationStatus().toString();
+              }
+            });
+
+    telemetry.addLine()
+            .addData("heading", new Func<String>() {
+              @Override public String value() {
+                return formatAngle(angles.angleUnit, angles.firstAngle);
+              }
+            })
+            .addData("roll", new Func<String>() {
+              @Override public String value() {
+                return formatAngle(angles.angleUnit, angles.secondAngle);
+              }
+            })
+            .addData("pitch", new Func<String>() {
+              @Override public String value() {
+                return formatAngle(angles.angleUnit, angles.thirdAngle);
+              }
+            });
+
+    telemetry.addLine()
+            .addData("grvty", new Func<String>() {
+              @Override public String value() {
+                return gravity.toString();
+              }
+            })
+            .addData("mag", new Func<String>() {
+              @Override public String value() {
+                return String.format(Locale.getDefault(), "%.3f",
+                        Math.sqrt(gravity.xAccel*gravity.xAccel
+                                + gravity.yAccel*gravity.yAccel
+                                + gravity.zAccel*gravity.zAccel));
+              }
+            });
+  }
+
+  //----------------------------------------------------------------------------------------------
+  // Formatting
+  //----------------------------------------------------------------------------------------------
+
+  String formatAngle(AngleUnit angleUnit, double angle) {
+    return formatDegrees(AngleUnit.DEGREES.fromUnit(angleUnit, angle));
+  }
+
+  String formatDegrees(double degrees){
+    return String.format(Locale.getDefault(), "%.1f", AngleUnit.DEGREES.normalize(degrees));
   }
 }

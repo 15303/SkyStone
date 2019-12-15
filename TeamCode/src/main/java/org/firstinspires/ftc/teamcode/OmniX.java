@@ -206,7 +206,7 @@ public class OmniX extends LinearOpMode {
 
       //driving do
 
-      driveNW.setPower ( (   driveRht + driveFwd + driveC ) / normalize ) ;
+      driveNW.setPower ( (   driveRht*0.84 + driveFwd + driveC ) / normalize ) ;
       driveNE.setPower ( (   driveRht - driveFwd + driveC ) / normalize ) ;
       driveSE.setPower ( ( - driveRht - driveFwd + driveC ) / normalize ) ;
       driveSW.setPower ( ( - driveRht + driveFwd + driveC ) / normalize ) ;
@@ -232,7 +232,7 @@ public class OmniX extends LinearOpMode {
 
 
       grabberPos  = ( gamepad1.dpad_up    || gamepad2.dpad_up    ) ?  0
-                  : ( gamepad1.dpad_down  || gamepad2.dpad_down  ) ?  0.7
+                  : ( gamepad1.dpad_down  || gamepad2.dpad_down  ) ?  1
                   :                                                   grabberPos ;
 
 
