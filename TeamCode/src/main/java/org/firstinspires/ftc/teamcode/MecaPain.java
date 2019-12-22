@@ -48,12 +48,12 @@ public class MecaPain extends LinearOpMode {
     left_back = hardwareMap.get(DcMotor.class, "left_back");
     right_back = hardwareMap.get(DcMotor.class, "right_back");
 
-    arm_1 = hardwareMap.get(DcMotor.class, "armH");
-    arm_2 = hardwareMap.get(DcMotor.class, "armV");
+    arm_1 = hardwareMap.get(DcMotor.class, "arm_1");
+    arm_2 = hardwareMap.get(DcMotor.class, "arm_2");
 
     dragger = hardwareMap.get(CRServo.class, "foundation");
-    rotate = hardwareMap.get(CRServo.class, "wrist");
-    grab = hardwareMap.get(CRServo.class, "grabber");
+    rotate = hardwareMap.get(CRServo.class, "rotate");
+    grab = hardwareMap.get(CRServo.class, "grab");
 
     // Most robots need the motor on one side to be reversed to drive forward
     // Reverse the motor that runs backwards when connected directly to the battery
