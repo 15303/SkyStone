@@ -49,9 +49,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="1: DC-X", group="Linear Opmode")
+@TeleOp(name="1: Driver Controlled", group="Linear Opmode")
 //@Disabled
-public class R1_BasicOpMode_Linear extends LinearOpMode {
+public class R1_DriverControlled extends LinearOpMode {
 
     // Declare OpMode members.
   private ElapsedTime runtime = new ElapsedTime();
@@ -102,13 +102,13 @@ public class R1_BasicOpMode_Linear extends LinearOpMode {
 //        arm_1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
     //encoders becau
-    left_front.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    right_front.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//    left_front.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//    right_front.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 //    left_back.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 //    right_back.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 //
-    left_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    right_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//    left_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//    right_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 //    left_back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 //    right_back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -116,25 +116,47 @@ public class R1_BasicOpMode_Linear extends LinearOpMode {
     // Wait for the game to start (driver presses PLAY)
     waitForStart();
     runtime.reset();
-    int outpos = 0;
+
+    //vars
+    int mode = 1;
+    boolean holdF = false;
+
     // run until the end of the match (driver presses STOP)
     while (opModeIsActive()) {
 
-      driveRht = - ( gamepad1.left_stick_x + gamepad1.right_stick_x + gamepad2.left_stick_x + gamepad2.right_stick_x ) / 2.5;
-      driveFwd = - ( gamepad1.left_stick_y + gamepad1.right_stick_y + gamepad2.left_stick_y + gamepad2.right_stick_y ) / 2.5;
-      driveC = ( gamepad1.left_trigger - gamepad1.right_trigger );
-      driveC *= driveC * driveC ;
+      double x = - gamepad1.right_stick_x;
+      double y = gamepad1.left_stick_y;
+      double lx = - gamepad1.left_stick_x;
 
-      left_front.setPower( driveFwd + (driveRht) + driveC);
-      left_back.setPower(driveFwd - (driveRht) + driveC);
-      right_front.setPower(driveFwd - (driveRht) - driveC);
-      right_back.setPower(driveFwd + (driveRht) - driveC);
+      if (gamepad1.a) {
+        mode = 1;
+      } else if (gamepad1.b) {
+        mode = 2;
+      }
+      telemetry.addData("mode", mode);
+
+      if (mode == 1) {
+        left_front.setPower(y+x-lx);
+        right_front.setPower(y-x+lx);
+        left_back.setPower(y+x+lx);
+        right_back.setPower(y-x-lx);
+      } else if (mode == 2) {
+        left_front.setPower(0.5*(y+x-lx));
+        right_front.setPower(0.5*(y-x+lx));
+        left_back.setPower(0.5*(y+x+lx));
+        right_back.setPower(0.5*(y-x-lx));
+      }
+
 
       if(gamepad1.dpad_up){
-        foundation.setPower(1);
-      }else if(gamepad1.dpad_down){
         foundation.setPower(-1);
-      }else{
+        holdF = false;
+      }else if(gamepad1.dpad_down){
+        foundation.setPower(1);
+        holdF = true;
+      }else if (holdF){
+        foundation.setPower(1);
+      } else {
         foundation.setPower(0);
       }
 
@@ -184,7 +206,6 @@ public class R1_BasicOpMode_Linear extends LinearOpMode {
 
       telemetry.addData("toehnu", arm_1.getCurrentPosition());
       telemetry.addData("runtime", getRuntime());
-      telemetry.addData("outpos", outpos);
       telemetry.update();
     }
   }
