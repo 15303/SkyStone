@@ -32,8 +32,15 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import android.app.Activity;
+import android.graphics.Color;
+import android.view.View;
+
+import java.util.Locale;
 
 
 /**
@@ -65,8 +72,10 @@ public class R1_red_stone_out extends LinearOpMode {
 
     private CRServo turn = null;
     private CRServo grab = null;
-
     private CRServo foundation = null;
+
+    private ColorSensor color = null;
+    private DistanceSensor dist = null;
 
     @Override
     public void runOpMode() {
@@ -76,18 +85,20 @@ public class R1_red_stone_out extends LinearOpMode {
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-        left_front  = hardwareMap.get(DcMotor.class, "left_front");
+        left_front  = hardwareMap.get(DcMotor.class, "left_front" );
         right_front = hardwareMap.get(DcMotor.class, "right_front");
-        left_back = hardwareMap.get(DcMotor.class, "left_back");
-        right_back = hardwareMap.get(DcMotor.class, "right_back");
+        left_back   = hardwareMap.get(DcMotor.class, "left_back"  );
+        right_back  = hardwareMap.get(DcMotor.class, "right_back" );
 
         arm_1 = hardwareMap.get(DcMotor.class, "arm_1");
         arm_2 = hardwareMap.get(DcMotor.class, "arm_2");
 
         turn = hardwareMap.get(CRServo.class, "turn");
         grab = hardwareMap.get(CRServo.class, "grab");
-
         foundation = hardwareMap.get(CRServo.class, "foundation");
+
+        color = hardwareMap.get(ColorSensor.class, "color");
+        dist = hardwareMap.get(DistanceSensor.class, "color");
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
@@ -107,23 +118,32 @@ public class R1_red_stone_out extends LinearOpMode {
         left_back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         right_back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        double s1;
+        double s2;
+        double s3;
+
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
 
-        drive(0.5, 750);
-        pause();
-        turn(-0.25, 0.25, 500);
 
+        side(-0.25, 2000);
 
-        telemetry.update();
+        s1 = (double) color.red()+color.blue();
+        while (opModeIsActive()) {
+            telemetry.addData("distance", );
+            telemetry.addData("value",color.red()+color.blue());
+            telemetry.update();
+        }
     }
     private void pause() {
         left_front.setPower(0);
         right_front.setPower(0);
         left_back.setPower(0);
         right_back.setPower(0);
+
         sleep(200);
+        stop();
     }
     private void drive(double power, int time) {
         left_front.setPower(power);
@@ -132,19 +152,30 @@ public class R1_red_stone_out extends LinearOpMode {
         right_back.setPower(power);
 
         sleep(time);
+        stop();
     }
     private void side(double power, int time) {
         left_front.setPower(-power);
         right_front.setPower(power);
         left_back.setPower(power);
         right_back.setPower(-power);
+
+        sleep(time);
+        stop();
     }
     private void turn(double powerL, double powerR, int time) {
         left_front.setPower(powerL);
         right_front.setPower(powerR);
         left_back.setPower(powerL);
-        right_front.setPower(powerR);
+        right_back.setPower(powerR);
 
         sleep(time);
+        stop();
+    }
+    private void stop() {
+        left_front.setPower(0);
+        right_front.setPower(0);
+        left_back.setPower(0);
+        right_back.setPower(0);
     }
 }
