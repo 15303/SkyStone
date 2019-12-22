@@ -104,13 +104,13 @@ public class R1_BasicOpMode_Linear extends LinearOpMode {
     //encoders becau
     left_front.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     right_front.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    left_back.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    right_back.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
+//    left_back.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//    right_back.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//
     left_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     right_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    left_back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    right_back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//    left_back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//    right_back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
     // Wait for the game to start (driver presses PLAY)
