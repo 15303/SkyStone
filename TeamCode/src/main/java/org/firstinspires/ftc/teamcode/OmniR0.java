@@ -116,7 +116,7 @@ public class OmniR0 extends LinearOpMode {
 
   // RGB sum
 
-  final int LUMIN_THRESHOLD           =  225 ;
+  final int LUMIN_THRESHOLD           =  800 ;
 
 
 
@@ -145,7 +145,7 @@ public class OmniR0 extends LinearOpMode {
 
 
 
-  boolean shouldGrab = false ;
+  boolean shouldGrab = true ;
   boolean shouldDrag = false ;
 
 
@@ -391,6 +391,10 @@ public class OmniR0 extends LinearOpMode {
 
     driveX    ( FULL_POWER                          ) ;
     runWhile  ( OPT_DIST_XL , DIST_X_DEPOT_CENTER     ) ;
+
+    shouldGrab = false;
+
+    runFor( TIME_TOGGLE_DRABBER );
 
 
     // drive forward for .2s

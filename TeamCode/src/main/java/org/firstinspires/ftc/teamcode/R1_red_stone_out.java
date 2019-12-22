@@ -62,8 +62,9 @@ public class R1_red_stone_out extends LinearOpMode {
 
     private DcMotor arm_1 = null;
     private DcMotor arm_2 = null;
-    private DcMotor out = null;
-    private DcMotor grab = null;
+
+    private CRServo turn = null;
+    private CRServo grab = null;
 
     private CRServo foundation = null;
 
@@ -82,8 +83,9 @@ public class R1_red_stone_out extends LinearOpMode {
 
         arm_1 = hardwareMap.get(DcMotor.class, "arm_1");
         arm_2 = hardwareMap.get(DcMotor.class, "arm_2");
-        out = hardwareMap.get(DcMotor.class, "out");
-        grab = hardwareMap.get(DcMotor.class, "grab");
+
+        turn = hardwareMap.get(CRServo.class, "turn");
+        grab = hardwareMap.get(CRServo.class, "grab");
 
         foundation = hardwareMap.get(CRServo.class, "foundation");
 
@@ -130,6 +132,12 @@ public class R1_red_stone_out extends LinearOpMode {
         right_back.setPower(power);
 
         sleep(time);
+    }
+    private void side(double power, int time) {
+        left_front.setPower(-power);
+        right_front.setPower(power);
+        left_back.setPower(power);
+        right_back.setPower(-power);
     }
     private void turn(double powerL, double powerR, int time) {
         left_front.setPower(powerL);
