@@ -129,20 +129,19 @@ public class R1_red_stone_out extends LinearOpMode {
 
         side(-0.25, 2000);
 
-        s1 = (double) color.red()+color.blue();
+        s1 = (double) color.red()+color.green();
         while (opModeIsActive()) {
-            telemetry.addData("value",color.red()+color.blue());
+            telemetry.addData("value",color.red()+color.green());
             telemetry.update();
         }
     }
+
+
+
     private void pause() {
-        left_front.setPower(0);
-        right_front.setPower(0);
-        left_back.setPower(0);
-        right_back.setPower(0);
+        stopp();
 
         sleep(200);
-        stopp();
     }
     private void drive(double power, int time) {
         left_front.setPower(power);
@@ -151,7 +150,7 @@ public class R1_red_stone_out extends LinearOpMode {
         right_back.setPower(power);
 
         sleep(time);
-        stopp();
+        pause();
     }
     private void side(double power, int time) {
         left_front.setPower(-power);
@@ -160,7 +159,7 @@ public class R1_red_stone_out extends LinearOpMode {
         right_back.setPower(-power);
 
         sleep(time);
-        stopp();
+        pause();
     }
     private void turn(double powerL, double powerR, int time) {
         left_front.setPower(powerL);
@@ -169,7 +168,7 @@ public class R1_red_stone_out extends LinearOpMode {
         right_back.setPower(powerR);
 
         sleep(time);
-        stopp();
+        pause();
     }
     private void stopp() {
         left_front.setPower(0);
