@@ -33,7 +33,9 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
@@ -63,10 +65,13 @@ public class R1_Autonomous_shell extends LinearOpMode {
 
     private DcMotor arm_1 = null;
     private DcMotor arm_2 = null;
-    private DcMotor out = null;
-    private DcMotor grab = null;
 
+    private CRServo rotate = null;
+    private CRServo grab = null;
     private CRServo foundation = null;
+
+    private ColorSensor color = null;
+    private DistanceSensor dist = null;
 
     @Override
     public void runOpMode() {
@@ -76,17 +81,20 @@ public class R1_Autonomous_shell extends LinearOpMode {
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-        left_front  = hardwareMap.get(DcMotor.class, "left_front");
+        left_front  = hardwareMap.get(DcMotor.class, "left_front" );
         right_front = hardwareMap.get(DcMotor.class, "right_front");
-        left_back = hardwareMap.get(DcMotor.class, "left_back");
-        right_back = hardwareMap.get(DcMotor.class, "right_back");
+        left_back   = hardwareMap.get(DcMotor.class, "left_back"  );
+        right_back  = hardwareMap.get(DcMotor.class, "right_back" );
 
         arm_1 = hardwareMap.get(DcMotor.class, "arm_1");
         arm_2 = hardwareMap.get(DcMotor.class, "arm_2");
-        out = hardwareMap.get(DcMotor.class, "out");
-        grab = hardwareMap.get(DcMotor.class, "grab");
 
+        rotate = hardwareMap.get(CRServo.class, "rotate");
+        grab = hardwareMap.get(CRServo.class, "grab");
         foundation = hardwareMap.get(CRServo.class, "foundation");
+
+        color = hardwareMap.get(ColorSensor.class, "color");
+        dist = hardwareMap.get(DistanceSensor.class, "color");
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
@@ -94,17 +102,6 @@ public class R1_Autonomous_shell extends LinearOpMode {
         right_front.setDirection(DcMotor.Direction.REVERSE);
         left_back.setDirection(DcMotor.Direction.FORWARD);
         right_back.setDirection(DcMotor.Direction.REVERSE);
-
-        //encoders because autonomous is autonomous
-        left_front.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        right_front.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        left_back.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        right_back.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        left_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        right_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        left_back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        right_back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
@@ -130,6 +127,7 @@ public class R1_Autonomous_shell extends LinearOpMode {
         right_back.setPower(power);
 
         sleep(time);
+        pause();
     }
     private void turn(double powerL, double powerR, int time) {
         left_front.setPower(powerL);
@@ -138,5 +136,15 @@ public class R1_Autonomous_shell extends LinearOpMode {
         right_front.setPower(powerR);
 
         sleep(time);
+        pause();
+    }
+    private void side(double power, int time) {
+        left_front.setPower(-power);
+        right_front.setPower(power);
+        left_back.setPower(power);
+        right_back.setPower(-power);
+        sleep(time);
+
+        pause();
     }
 }

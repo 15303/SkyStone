@@ -29,28 +29,12 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import android.app.Activity;
-import android.graphics.Color;
-import android.view.View;
-
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-
-import java.util.Locale;
-
-import static java.lang.Math.abs;
 
 
 /**
@@ -66,9 +50,9 @@ import static java.lang.Math.abs;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="1: red stone out", group="Linear Opmode")
-@Disabled
-public class R1_red_stone_out extends LinearOpMode {
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="1: red foundation out", group="Linear Opmode")
+//@Disabled
+public class R1_red_foundation_out extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -86,9 +70,6 @@ public class R1_red_stone_out extends LinearOpMode {
 
     private ColorSensor color = null;
     private DistanceSensor dist = null;
-
-    private BNO055IMU imu;
-    private Orientation angles;
 
     @Override
     public void runOpMode() {
@@ -120,53 +101,34 @@ public class R1_red_stone_out extends LinearOpMode {
         left_back.setDirection(DcMotor.Direction.REVERSE);
         right_back.setDirection(DcMotor.Direction.FORWARD);
 
-        //encoders because autonomous is autonomous
-//        left_front.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        right_front.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        left_back.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        right_back.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//
-//        left_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        right_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        left_back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        right_back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        double s1;
-        double s2;
-        double s3;
-
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        parameters.calibrationDataFile = "BNO055IMUCalibration.json";
-
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        imu.initialize(parameters);
-
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
 
+        arm_1.setPower(-0.5); //move arm out of the way of foundation
+        drive(0.25, 2500); //drive to foundation
+        arm_1.setPower(0);
+        foundation.setPower(1); //set down foundation grabber
+        sleep(1750);
+        foundation.setPower(0.5);
+        drive(-0.5, 3000); //drive back into build zone
+        foundation.setPower(-1); //retract foundation grabber
+        sleep(1000);
+        foundation.setPower(-0.5);
+        side(-0.5, 2750); // move towards bridge
+        foundation.setPower(0);
+        drive(0.25, 1250); //move forwards to align with foundation
+        side(0.5, 1000); //move sideways to push foundation into build zone
+        drive(-0.5, 1000); //move back into wall
+        side(-0.75, 1500); //move into bridge
 
-        side(-0.75, 90, 2000);
-
-        s1 = (double) color.red()+color.green();
-        while (opModeIsActive() && !isStopRequested()) {
-            telemetry.addData("value",color.red()+color.green());
-            telemetry.addData("distance", dist.getDistance(DistanceUnit.INCH));
-            angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYZ, AngleUnit.DEGREES);
-            if (angles.firstAngle < 0) {
-                angles.firstAngle += 180;
-            }
-            telemetry.addData("heading", angles.firstAngle);
-            telemetry.update();
-        }
+        telemetry.update();
     }
-
-
-
     private void pause() {
-        stopp();
-
+        left_front.setPower(0);
+        right_front.setPower(0);
+        left_back.setPower(0);
+        right_back.setPower(0);
         sleep(200);
     }
     private void drive(double power, int time) {
@@ -178,56 +140,22 @@ public class R1_red_stone_out extends LinearOpMode {
         sleep(time);
         pause();
     }
-    private void side(double power, double degree, int time) {
-//        double startt = getRuntime();
-//        double endt = startt+time;
-
-//        while (opModeIsActive() && getRuntime() < endt) {
-//            angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYZ, AngleUnit.DEGREES);
-//            if (angles.firstAngle < 0) {
-//                angles.firstAngle += 180;
-//            }
-//
-//            if (angles.firstAngle > degree+3) {
-//                left_front.setPower(-power);
-//                right_front.setPower(power);
-//                left_back.setPower(power - abs((degree-angles.firstAngle)/20));
-//                right_back.setPower(-power + abs((degree-angles.firstAngle)/20));
-//            } else if (angles.firstAngle < degree - 3) {
-//                left_front.setPower(-power + abs((degree-angles.firstAngle)/20));
-//                right_front.setPower(power - abs((degree-angles.firstAngle)/20));
-//                left_back.setPower(power);
-//                right_back.setPower(-power);
-//            } else {
-                left_front.setPower(-power);
-                right_front.setPower(power);
-                left_back.setPower(power);
-                right_back.setPower(-power);
-//            }
-//            telemetry.addData("correction power", ((degree-angles.firstAngle)/20));
-//            telemetry.addData("angle", angles.firstAngle);
-//            telemetry.addData("runtime", getRuntime());
-//            telemetry.addData("should be 1", abs(-1));
-//            telemetry.update();
-//
-//        }
-        sleep(time);
-
-        pause();
-    }
     private void turn(double powerL, double powerR, int time) {
         left_front.setPower(powerL);
         right_front.setPower(powerR);
         left_back.setPower(powerL);
-        right_back.setPower(powerR);
+        right_front.setPower(powerR);
 
         sleep(time);
         pause();
     }
-    private void stopp() {
-        left_front.setPower(0);
-        right_front.setPower(0);
-        left_back.setPower(0);
-        right_back.setPower(0);
+    private void side(double power, int time) {
+        left_front.setPower(-power);
+        right_front.setPower(power);
+        left_back.setPower(power);
+        right_back.setPower(-power);
+
+        sleep(time);
+        pause();
     }
 }

@@ -93,22 +93,22 @@ public class R1_BasicOpMode_Linear extends LinearOpMode {
 
     // Most robots need the motor on one side to be reversed to drive forward
     // Reverse the motor that runs backwards when connected directly to the battery
-    left_front.setDirection(DcMotor.Direction.FORWARD);
-    right_front.setDirection(DcMotor.Direction.REVERSE);
-    left_back.setDirection(DcMotor.Direction.FORWARD);
-    right_back.setDirection(DcMotor.Direction.REVERSE);
+    left_front.setDirection(DcMotor.Direction.REVERSE);
+    right_front.setDirection(DcMotor.Direction.FORWARD);
+    left_back.setDirection(DcMotor.Direction.REVERSE);
+    right_back.setDirection(DcMotor.Direction.FORWARD);
 
 //        arm_1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 //        arm_1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
     //encoders becau
-    left_front.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-    right_front.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//    left_back.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//    right_back.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//
-    left_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    right_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//    left_front.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//    right_front.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+////    left_back.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+////    right_back.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+////
+//    left_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//    right_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 //    left_back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 //    right_back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -125,10 +125,10 @@ public class R1_BasicOpMode_Linear extends LinearOpMode {
       driveC = ( gamepad1.left_trigger - gamepad1.right_trigger );
       driveC *= driveC * driveC ;
 
-      left_front.setPower( driveFwd + (driveRht) + driveC);
-      left_back.setPower(driveFwd - (driveRht) + driveC);
-      right_front.setPower(driveFwd - (driveRht) - driveC);
-      right_back.setPower(driveFwd + (driveRht) - driveC);
+      left_front.setPower( driveFwd + (driveRht) - driveC);
+      left_back.setPower(driveFwd - (driveRht) - driveC);
+      right_front.setPower(driveFwd - (driveRht) + driveC);
+      right_back.setPower(driveFwd + (driveRht) + driveC);
 
       if(gamepad1.dpad_up){
         foundation.setPower(1);
@@ -140,13 +140,13 @@ public class R1_BasicOpMode_Linear extends LinearOpMode {
 
 
       //arm movement
-      if (gamepad2.x) {
+      if (gamepad2.x||gamepad1.x) {
 //                if(arm_1.getCurrentPosition() > -200) {
               arm_1.setPower(1);
 //                } else {
 //                    arm_1.setPower(0.25);
 //                }
-      } else if (gamepad2.y) {
+      } else if (gamepad2.y||gamepad1.x) {
 //                if(arm_1.getCurrentPosition() < -2000) {
         arm_1.setPower(-1);
 //                } else {

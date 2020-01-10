@@ -31,7 +31,9 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
@@ -61,10 +63,13 @@ public class R1_blue_foundation_out extends LinearOpMode {
 
     private DcMotor arm_1 = null;
     private DcMotor arm_2 = null;
-    private DcMotor out = null;
-    private DcMotor grab = null;
 
+    private CRServo rotate = null;
+    private CRServo grab = null;
     private CRServo foundation = null;
+
+    private ColorSensor color = null;
+    private DistanceSensor dist = null;
 
     @Override
     public void runOpMode() {
@@ -74,62 +79,48 @@ public class R1_blue_foundation_out extends LinearOpMode {
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-        left_front  = hardwareMap.get(DcMotor.class, "left_front");
+        left_front  = hardwareMap.get(DcMotor.class, "left_front" );
         right_front = hardwareMap.get(DcMotor.class, "right_front");
-        left_back = hardwareMap.get(DcMotor.class, "left_back");
-        right_back = hardwareMap.get(DcMotor.class, "right_back");
+        left_back   = hardwareMap.get(DcMotor.class, "left_back"  );
+        right_back  = hardwareMap.get(DcMotor.class, "right_back" );
 
         arm_1 = hardwareMap.get(DcMotor.class, "arm_1");
         arm_2 = hardwareMap.get(DcMotor.class, "arm_2");
-        out = hardwareMap.get(DcMotor.class, "out");
-        grab = hardwareMap.get(DcMotor.class, "grab");
 
+        rotate = hardwareMap.get(CRServo.class, "rotate");
+        grab = hardwareMap.get(CRServo.class, "grab");
         foundation = hardwareMap.get(CRServo.class, "foundation");
+
+        color = hardwareMap.get(ColorSensor.class, "color");
+        dist = hardwareMap.get(DistanceSensor.class, "color");
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
-        left_front.setDirection(DcMotor.Direction.FORWARD);
-        right_front.setDirection(DcMotor.Direction.REVERSE);
-        left_back.setDirection(DcMotor.Direction.FORWARD);
-        right_back.setDirection(DcMotor.Direction.REVERSE);
-
-        //encoders because autonomous is autonomous
-        left_front.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        right_front.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        left_back.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        right_back.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        left_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        right_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        left_back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        right_back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        left_front.setDirection(DcMotor.Direction.REVERSE);
+        right_front.setDirection(DcMotor.Direction.FORWARD);
+        left_back.setDirection(DcMotor.Direction.REVERSE);
+        right_back.setDirection(DcMotor.Direction.FORWARD);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
 
-        arm_1.setPower(-1); //move arm up
-        drive(0.5, 1050); //drive to foundation
+        arm_1.setPower(-0.5); //move arm out of the way of foundation
+        drive(0.25, 2500); //drive to foundation
         arm_1.setPower(0);
-        pause();
-        sideways(-1, 600);
-        drive(0.5, 150);
-        pause();
-        foundation.setPower(1); //grab foundation
-        sleep(3000);
+        foundation.setPower(1); //set down foundation grabber
+        sleep(1750);
         foundation.setPower(0.5);
-        drive(-0.5, 1500); //move back into build site
-        pause();
-        foundation.setPower(-1);
-        sleep(3000);
-        arm_1.setPower(0.25);
-        arm_2.setPower(1);
-        sideways(1, 1250);
-        arm_1.setPower(0);
-        arm_2.setPower(0);
-        sideways(1, 800);
-        pause();
-        drive(-1, 200);
+        drive(-0.5, 3000); //drive back into build zone
+        foundation.setPower(-1); //retract foundation grabber
+        sleep(1000);
+        foundation.setPower(-0.5);
+        side(0.5, 3000); // move towards bridge
+        foundation.setPower(0);
+        drive(0.25, 1250); //move forwards to align with foundation
+        side(-0.5, 1000); //move sideways to push foundation into build zone
+        drive(-0.5, 1000); //move back into wall
+        side(0.75, 1500); //move into bridge
 
         telemetry.update();
     }
@@ -147,6 +138,7 @@ public class R1_blue_foundation_out extends LinearOpMode {
         right_back.setPower(power);
 
         sleep(time);
+        pause();
     }
     private void turn(double powerL, double powerR, int time) {
         left_front.setPower(powerL);
@@ -155,12 +147,15 @@ public class R1_blue_foundation_out extends LinearOpMode {
         right_front.setPower(powerR);
 
         sleep(time);
+        pause();
     }
-    private void sideways(double power, int time) {
+    private void side(double power, int time) {
         left_front.setPower(-power);
         right_front.setPower(power);
         left_back.setPower(power);
         right_back.setPower(-power);
+
         sleep(time);
+        pause();
     }
 }
