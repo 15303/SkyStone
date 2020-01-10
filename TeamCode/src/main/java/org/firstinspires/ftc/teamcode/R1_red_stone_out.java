@@ -29,16 +29,24 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import android.app.Activity;
 import android.graphics.Color;
 import android.view.View;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 import java.util.Locale;
 
@@ -70,12 +78,15 @@ public class R1_red_stone_out extends LinearOpMode {
     private DcMotor arm_1 = null;
     private DcMotor arm_2 = null;
 
-    private CRServo turn = null;
+    private CRServo rotate = null;
     private CRServo grab = null;
     private CRServo foundation = null;
 
     private ColorSensor color = null;
     private DistanceSensor dist = null;
+
+    private BNO055IMU imu;
+    private Orientation angles;
 
     @Override
     public void runOpMode() {
@@ -93,7 +104,7 @@ public class R1_red_stone_out extends LinearOpMode {
         arm_1 = hardwareMap.get(DcMotor.class, "arm_1");
         arm_2 = hardwareMap.get(DcMotor.class, "arm_2");
 
-        turn = hardwareMap.get(CRServo.class, "turn");
+        rotate = hardwareMap.get(CRServo.class, "rotate");
         grab = hardwareMap.get(CRServo.class, "grab");
         foundation = hardwareMap.get(CRServo.class, "foundation");
 
@@ -102,36 +113,49 @@ public class R1_red_stone_out extends LinearOpMode {
 
         // Most robots need the motor on one side to be reversed to drive forward
         // Reverse the motor that runs backwards when connected directly to the battery
-        left_front.setDirection(DcMotor.Direction.FORWARD);
-        right_front.setDirection(DcMotor.Direction.REVERSE);
-        left_back.setDirection(DcMotor.Direction.FORWARD);
-        right_back.setDirection(DcMotor.Direction.REVERSE);
+        left_front.setDirection(DcMotor.Direction.REVERSE);
+        right_front.setDirection(DcMotor.Direction.FORWARD);
+        left_back.setDirection(DcMotor.Direction.REVERSE);
+        right_back.setDirection(DcMotor.Direction.FORWARD);
 
         //encoders because autonomous is autonomous
-        left_front.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        right_front.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        left_back.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        right_back.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        left_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        right_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        left_back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        right_back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        left_front.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        right_front.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        left_back.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        right_back.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//
+//        left_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        right_front.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        left_back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        right_back.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         double s1;
         double s2;
         double s3;
+
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json";
+
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
 
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
 
 
-        side(-0.25, 2000);
+        side(-0.5, 90, 2000);
 
         s1 = (double) color.red()+color.green();
-        while (opModeIsActive()) {
+        while (opModeIsActive() && !isStopRequested()) {
             telemetry.addData("value",color.red()+color.green());
+            telemetry.addData("distance", dist.getDistance(DistanceUnit.INCH));
+            angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYZ, AngleUnit.DEGREES);
+            if (angles.firstAngle < 0) {
+                angles.firstAngle += 180;
+            }
+            telemetry.addData("heading", angles.firstAngle);
             telemetry.update();
         }
     }
@@ -152,13 +176,35 @@ public class R1_red_stone_out extends LinearOpMode {
         sleep(time);
         pause();
     }
-    private void side(double power, int time) {
-        left_front.setPower(-power);
-        right_front.setPower(power);
-        left_back.setPower(power);
-        right_back.setPower(-power);
+    private void side(double power, double degree, int time) {
+        double startt = getRuntime();
+        double endt = startt+time;
 
-        sleep(time);
+        while (opModeIsActive() && getRuntime() < endt) {
+            angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYZ, AngleUnit.DEGREES);
+            if (angles.firstAngle < 0) {
+                angles.firstAngle += 180;
+            }
+
+            if (angles.firstAngle > degree+3) {
+                left_front.setPower(-power);
+                right_front.setPower(power);
+                left_back.setPower(power - ((degree-angles.firstAngle)/10));
+                right_back.setPower(-power + ((degree-angles.firstAngle)/10));
+            } else if (angles.firstAngle < degree - 3) {
+                left_front.setPower(-power + ((degree-angles.firstAngle)/10));
+                right_front.setPower(power - ((degree-angles.firstAngle)/10));
+                left_back.setPower(power);
+                right_back.setPower(-power);
+            } else {
+                left_front.setPower(-power);
+                right_front.setPower(power);
+                left_back.setPower(power);
+                right_back.setPower(-power);
+            }
+
+        }
+
         pause();
     }
     private void turn(double powerL, double powerR, int time) {
