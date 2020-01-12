@@ -21,7 +21,7 @@ import java.util.Locale;
 @Autonomous (
 
   name  = "OmniR0 v2"         ,
-  group = "Linear Opmode"
+  group = "r2"
 
 )
 

@@ -35,7 +35,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous (
 
   name  = "OmniR0"         ,
-  group = "Linear Opmode"
+  group = "r2"
 
 )
 

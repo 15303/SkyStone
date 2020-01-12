@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 @TeleOp (
 
   name  = "OmniC"         ,
-  group = "Linear Opmode"
+  group = "r2"
 
 )
 

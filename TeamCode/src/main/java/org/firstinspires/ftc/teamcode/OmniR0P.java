@@ -20,7 +20,7 @@ import java.util.Locale;
 @Autonomous (
 
   name  = "OmniR0_no_foundation"         ,
-  group = "Linear Opmode"
+  group = "r2"
 
 )
 

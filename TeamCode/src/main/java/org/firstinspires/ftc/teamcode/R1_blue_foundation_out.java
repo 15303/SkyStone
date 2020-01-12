@@ -50,7 +50,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="1: blue foundation out", group="r1")
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="blue foundation out", group="r1")
 //@Disabled
 public class R1_blue_foundation_out extends LinearOpMode {
 

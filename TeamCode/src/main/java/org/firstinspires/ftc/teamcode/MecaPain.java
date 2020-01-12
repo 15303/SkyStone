@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-@TeleOp(name="MecaPain", group="Linear Opmode")
+@TeleOp(name="MecaPain", group="r1")
 @Disabled
 public class MecaPain extends LinearOpMode {
 

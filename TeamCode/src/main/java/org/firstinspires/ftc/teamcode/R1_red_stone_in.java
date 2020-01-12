@@ -50,9 +50,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="red foundation in", group="r1")
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="red stone in", group="r1")
 //@Disabled
-public class R1_red_foundation_in extends LinearOpMode {
+public class R1_red_stone_in extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -105,21 +105,47 @@ public class R1_red_foundation_in extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
-        arm_1.setPower(-0.5); //move arm out of the way of foundation
-        drive(0.25, 2500); //drive to foundation
+        sleep(8000);
+
+        arm_2.setPower(1);               //extend arm so doesn't collide with robot
+//        rotate.setPower(1);
+        drive(0.25, 400);   //move towards stones
+//        rotate.setPower(0);
+        grab.setPower(-1);               //open grabber
+        sleep(950);
+        arm_1.setPower(0.5);             //move arm down onto stone
+        arm_2.setPower(0);               //stop extending
+        pause();                         //stop moving towards stones
+        grab.setPower(0);                //stop opening grabber
+        sleep(750);
+        arm_1.setPower(0);               //stop moving arm down onto stone
+        grab.setPower(1);                //grab the stone
+        sleep(1500);
+        arm_2.setPower(-1);              //retract the arm for better turning
+        sleep(750);
+        arm_2.setPower(0);               //stop retracting the arm
+        drivep(-0.25, 1500);//go back
+        arm_1.setPower(-0.4);            //move stone up to reduce friction for better turning
+        grab.setPower(1);
+
+        turnp(-0.6, 0.6, 2500); //turn towards bridge/foundation
+        drivep(-0.25, 200); //move away from bridge so arm doesn't collide
+
+        arm_1.setPower(0.5);             //move stone back down to go under bridge
+        arm_2.setPower(1);               //extend the arm again
+        sleep(500);
+        arm_1.setPower(0);               //stop resetting the arm
+        arm_2.setPower(0);
+        drivep(0.3, 2800);  //drive towards the foundation past the bridge
+        arm_1.setPower(-0.75);           //move stone back up to clear the foundation
+        sleep(750);
         arm_1.setPower(0);
-        foundation.setPower(1); //set down foundation grabber
-        sleep(1750);
-        foundation.setPower(0.5);
-        drive(-0.5, 3000); //drive back into build zone
-        foundation.setPower(-1); //retract foundation grabber
-        sleep(1000);
-        foundation.setPower(-0.5);
-        side(-0.5, 2750); // move towards bridge
-        foundation.setPower(0);
-        drive(0.25, 1250); //move forwards to align with foundation
-        side(0.5, 1000); //move sideways to push foundation into build zone
-        side(-0.75, 1500); //move into bridge
+        drivep(0.25, 1500); //move into the foundation to make sure stone is over foundation
+        grab.setPower(-0.5);             //release the stone
+        sleep(500);
+        grab.setPower(0);
+        arm_1.setPower(0.5);             //move arm down to park under bridge
+        drivep(-0.25, 2000);//move back to park under bridge
 
         telemetry.update();
     }
@@ -137,24 +163,30 @@ public class R1_red_foundation_in extends LinearOpMode {
         right_back.setPower(power);
 
         sleep(time);
+    }
+    private void drivep(double power, int time) {
+        drive(power, time);
         pause();
     }
     private void turn(double powerL, double powerR, int time) {
-        left_front.setPower(powerL);
-        right_front.setPower(powerR);
-        left_back.setPower(powerL);
-        right_front.setPower(powerR);
+        left_front.setPower(-powerL);
+        right_front.setPower(-powerR);
+        left_back.setPower(-powerL);
+        right_front.setPower(-powerR);
 
         sleep(time);
+    }
+    private void turnp(double powerL, double powerR, int time) {
+        turn(powerL, powerR, time);
         pause();
     }
-    private void side(double power, int time) {
+    private void sidep(double power, int time) {
         left_front.setPower(-power);
         right_front.setPower(power);
         left_back.setPower(power);
         right_back.setPower(-power);
-
         sleep(time);
+
         pause();
     }
 }

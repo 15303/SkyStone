@@ -20,7 +20,7 @@ import java.util.Locale;
 @Autonomous (
 
   name  = "OmniP"         ,
-  group = "Linear Opmode"
+  group = "r2"
 
 )
 

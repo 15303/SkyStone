@@ -26,7 +26,7 @@ import java.util.Locale;
 @Autonomous (
 
   name  = "OmniRdikj0_v2"         ,
-  group = "Linear Opmode"
+  group = "r2"
 
 )
 

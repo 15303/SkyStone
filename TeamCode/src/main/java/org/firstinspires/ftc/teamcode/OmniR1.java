@@ -16,7 +16,7 @@ import java.util.Locale ;
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous (
 
   name  = "OmniR1"         ,
-  group = "Linear Opmode"
+  group = "r2"
 
 )
 
