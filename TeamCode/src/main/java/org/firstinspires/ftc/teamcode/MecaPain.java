@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 @TeleOp(name="MecaPain", group="Linear Opmode")
-//@Disabled
+@Disabled
 public class MecaPain extends LinearOpMode {
 
   private ElapsedTime runtime = new ElapsedTime();

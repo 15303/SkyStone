@@ -50,9 +50,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="1: red foundation out", group="r1")
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="1: blue foundation in", group="r1")
 //@Disabled
-public class R1_red_foundation_out extends LinearOpMode {
+public class R1_blue_foundation_in extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -115,12 +115,11 @@ public class R1_red_foundation_out extends LinearOpMode {
         foundation.setPower(-1); //retract foundation grabber
         sleep(1000);
         foundation.setPower(-0.5);
-        side(-0.5, 2750); // move towards bridge
+        side(0.5, 3000); // move towards bridge
         foundation.setPower(0);
         drive(0.25, 1250); //move forwards to align with foundation
-        side(0.5, 1000); //move sideways to push foundation into build zone
-        drive(-0.5, 1000); //move back into wall
-        side(-0.75, 1500); //move into bridge
+        side(-0.5, 1000); //move sideways to push foundation into build zone
+        side(0.75, 1500); //move into bridge
 
         telemetry.update();
     }
