@@ -82,6 +82,12 @@ public class OmniX extends LinearOpMode {
   double stickYR = 0 ;
   double trigL   = 0 ;
   double trigR   = 0 ;
+  double bumpL   = 0 ;
+  double bumpR   = 0 ;
+
+
+  double grabberOpen    = 0.6;
+  double grabberClosed  = 0.1;
 
 
 
@@ -101,7 +107,13 @@ public class OmniX extends LinearOpMode {
 
 
   double sliderPower = 0   ;
-  double grabberPos  = 0.7 ;
+  double grabberPos  = grabberOpen ;
+  double draggerPos  = 0 ;
+
+
+
+
+  boolean charmode = false;
 
 
 
@@ -113,12 +125,9 @@ public class OmniX extends LinearOpMode {
 
 
 
-
-
-
-
-
-
+  private double booleanToNum( boolean bool ){
+    return bool ? 1 : -1;
+  }
 
 
 
@@ -187,6 +196,9 @@ public class OmniX extends LinearOpMode {
 
       trigL   = gamepad1.left_trigger  + gamepad2.left_trigger  ;
       trigR   = gamepad1.right_trigger + gamepad2.right_trigger ;
+      bumpL   = booleanToNum( gamepad1.left_bumper  ) + booleanToNum( gamepad2.left_bumper  );
+      bumpR   = booleanToNum( gamepad1.right_bumper ) + booleanToNum( gamepad2.right_bumper );
+
 
 
 
@@ -194,7 +206,7 @@ public class OmniX extends LinearOpMode {
 
       driveRht = - ( Math.pow ( stickXL , 3 ) + Math.pow ( stickXR , 3 ) ) / 2 ;
 
-      driveC   =  Math.pow ( trigL , 3 ) - Math.pow ( trigR , 3 ) ;
+      driveC   =  ( trigL - trigR ) + 0.1 * ( bumpL - bumpR ) ;
 
 
       normalize = Math.max ( Math.abs ( driveRht ) + Math.abs ( driveFwd ) + Math.abs ( driveC ) , 1 ) ;
@@ -206,7 +218,7 @@ public class OmniX extends LinearOpMode {
 
       //driving do
 
-      driveNW.setPower ( (   driveRht*0.84 + driveFwd + driveC ) / normalize ) ;
+      driveNW.setPower ( (   driveRht + driveFwd + driveC ) / normalize ) ;
       driveNE.setPower ( (   driveRht - driveFwd + driveC ) / normalize ) ;
       driveSE.setPower ( ( - driveRht - driveFwd + driveC ) / normalize ) ;
       driveSW.setPower ( ( - driveRht + driveFwd + driveC ) / normalize ) ;
@@ -226,14 +238,37 @@ public class OmniX extends LinearOpMode {
 
       // arm define
 
-      sliderPower = ( gamepad1.dpad_left  || gamepad2.dpad_left  ) ?  1
-                  : ( gamepad1.dpad_right || gamepad2.dpad_right ) ? -1
-                  :                                                   0          ;
+      if ( !charmode && gamepad2.x && gamepad2.start ) {
+        charmode = true;
+      }
+
+      if ( charmode ) {
+
+        grabberPos  = ( gamepad1.dpad_up    || gamepad2.dpad_left  ) ?  grabberOpen
+                    : ( gamepad1.dpad_down  || gamepad2.dpad_right ) ?  grabberClosed
+                    :                                                   grabberPos ;
+
+        sliderPower = ( gamepad1.dpad_left  || gamepad2.dpad_down  ) ?  1
+                    : ( gamepad1.dpad_right || gamepad2.dpad_up    ) ? -1
+                    :                                                    0          ;
+
+      } else {
 
 
-      grabberPos  = ( gamepad1.dpad_up    || gamepad2.dpad_up    ) ?  0
-                  : ( gamepad1.dpad_down  || gamepad2.dpad_down  ) ?  1
-                  :                                                   grabberPos ;
+        sliderPower = ( gamepad1.dpad_left  || gamepad2.dpad_left  ) ?  1
+                    : ( gamepad1.dpad_right || gamepad2.dpad_right ) ? -1
+                    :                                                   0          ;
+
+
+        grabberPos  = ( gamepad1.dpad_up    || gamepad2.dpad_up    ) ?  grabberOpen
+                    : ( gamepad1.dpad_down  || gamepad2.dpad_down  ) ?  grabberClosed
+                    :                                                   grabberPos ;
+
+      }
+
+      draggerPos  = ( gamepad1.y          || gamepad2.y            ) ?  0
+                  : ( gamepad1.a          || gamepad2.a            ) ?  1
+                  :                                                   draggerPos ;
 
 
 
@@ -244,6 +279,7 @@ public class OmniX extends LinearOpMode {
 
       slider.setPower     ( sliderPower ) ;
       grabber.setPosition ( grabberPos  ) ;
+      dragger.setPosition ( draggerPos  ) ;
 
 
 
@@ -264,8 +300,11 @@ public class OmniX extends LinearOpMode {
       telemetry.addData ( "DriveC     " ,  driveC            ) ;
       telemetry.addData ( "SliderPower" ,  sliderPower       ) ;
       telemetry.addData ( "GrabberPos " ,  grabberPos        ) ;
+      telemetry.addData ( "DraggerPos " ,  draggerPos        ) ;
       telemetry.addData ( "Normalize  " ,  normalize         ) ;
-      telemetry.update  (                                    ) ;
+      telemetry.update  (                                            ) ;
+
+
 
 
 
