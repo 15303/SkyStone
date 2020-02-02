@@ -249,7 +249,7 @@ public class OmniR0 extends LinearOpMode {
     while( Math.abs(getDeltaAngle()) > 2 )
 
       if (absDeltaAngle > 5) {
-  
+
         driveSpn(Math.signum(-deltaAngle) * 0.1);
 
       }
