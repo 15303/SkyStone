@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -20,18 +19,15 @@ import java.util.Locale;
 
 @Autonomous (
 
-  name  = "OmniR0 v2"         ,
+  name  = "OmniR0 imu gyro test"         ,
   group = "r2"
 
 )
 
- @Disabled
+// @Disabled
 
 
-public class OmniR0_v2 extends LinearOpMode {
-
-
-  boolean isRed = true ; // IMPORTANT
+public class OmniR0_imutest extends LinearOpMode {
 
 
   private ElapsedTime runtime = new ElapsedTime() ;
@@ -58,33 +54,25 @@ public class OmniR0_v2 extends LinearOpMode {
 
 
 
-  private double distN =  30 ;
-  private double distX =   0 ;
-  private double distS = 100 ;
-  private double lumin = 800 ;
-  private double time  =   0 ;
+  double distN =  30 ;
+  double distX =   0 ;
+  double distS = 100 ;
+  double lumin = 800 ;
+  double time  =   0 ;
 
 
-  private int currentAngle = 0;
-  private int deltaAngle = 0 ;
-  private int absDeltaAngle = 0 ;
-  private int targetAngle = 0 ;
-  private double turnPower = 0;
-
-
-  //light levels of stones
-  private double l1 = 0;
-  private double l2 = 0;
-  private double l3 = 0;
-  //decided stone
-  private int stone = 1;
+  int currentAngle = 0;
+  int deltaAngle = 0 ;
+  int absDeltaAngle = 0 ;
+  int targetAngle = 0 ;
+  double turnPower = 0;
 
 
   // power
 
-  private final double CAUTIOUS_POWER         =    0.3 ;
-  private final double NORMAL_POWER           =    0.5 ;
-  private final double FULL_POWER             =    1   ;
+  final double CAUTIOUS_POWER         =    0.3 ;
+  final double NORMAL_POWER           =    0.5 ;
+  final double FULL_POWER             =    1   ;
 
 
 
@@ -93,15 +81,11 @@ public class OmniR0_v2 extends LinearOpMode {
   final int DIST_X_WALL               =   10 ;
   final int DIST_Y_WALL               =    5 ;
 
-  final int DIST_Y_STONE_1            =   35 ;
-  final int DIST_Y_STONE_2            =   42 ;
-  final int DIST_Y_STONE_3            =   51 ;
-
   final int DIST_Y_SKYBRIDGE          =   60 ;
 
   final int DIST_X_INTRACK_OUTER      =   30 ;
 
-  final int DIST_X_DEPOT_CENTER       =   42 ;
+  final int DIST_X_DEPOT_CENTER       =   40 ;
   final int DIST_X_DEPOT_OUTER        =   -6 + DIST_X_DEPOT_CENTER ;
 
   final int DIST_X_FOUNDATION_CENTER  =   45 ;
@@ -114,7 +98,7 @@ public class OmniR0_v2 extends LinearOpMode {
 
   // RGB sum
 
-  final int LUMIN_THRESHOLD           =  225 ;
+  final int LUMIN_THRESHOLD           =  800 ;
 
 
 
@@ -143,7 +127,7 @@ public class OmniR0_v2 extends LinearOpMode {
 
 
 
-  boolean shouldGrab = false ;
+  boolean shouldGrab = true ;
   boolean shouldDrag = false ;
 
 
@@ -157,7 +141,7 @@ public class OmniR0_v2 extends LinearOpMode {
 
     }
 
-    driveNW.setPower (  power*0.9 ) ;
+    driveNW.setPower (  power ) ;
     driveNE.setPower (  power ) ;
     driveSE.setPower ( -power ) ;
     driveSW.setPower ( -power ) ;
@@ -282,36 +266,28 @@ public class OmniR0_v2 extends LinearOpMode {
 
     switch ( option ) {
 
-      case  0 :
-        while ( opModeIsActive() && lumin > comparator ) { update () ; }
+      case  0 : while ( opModeIsActive() && lumin > comparator ) { update () ; }
       break ;
 
-      case -1 :
-        while ( opModeIsActive() && distN < comparator ) { update () ; }
+      case -1 : while ( opModeIsActive() && distN < comparator ) { update () ; }
       break ;
 
-      case  1 :
-        while ( opModeIsActive() && distN > comparator ) { update () ; }
+      case  1 : while ( opModeIsActive() && distN > comparator ) { update () ; }
       break ;
 
-      case -2 :
-        while ( opModeIsActive() && distX < comparator ) { update () ; }
+      case -2 : while ( opModeIsActive() && distX < comparator ) { update () ; }
       break ;
 
-      case  2 :
-        while ( opModeIsActive() && distX > comparator ) { update () ; }
+      case  2 : while ( opModeIsActive() && distX > comparator ) { update () ; }
       break ;
 
-      case -3 :
-        while ( opModeIsActive() && distS < comparator ) { update () ; }
+      case -3 : while ( opModeIsActive() && distS < comparator ) { update () ; }
       break ;
 
-      case  3 :
-        while ( opModeIsActive() && distS > comparator ) { update () ; }
+      case  3 : while ( opModeIsActive() && distS > comparator ) { update () ; }
       break ;
 
-      case -4 :
-        while ( opModeIsActive() && time < comparator )  { update () ; }
+      case -4 : while ( opModeIsActive() && time < comparator )  { update () ; }
       break ;
 
     }
@@ -357,7 +333,6 @@ public class OmniR0_v2 extends LinearOpMode {
     BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
     parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
     parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-    parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
     parameters.loggingEnabled      = true;
     parameters.loggingTag          = "IMU";
     parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
@@ -371,196 +346,7 @@ public class OmniR0_v2 extends LinearOpMode {
     runtime.reset() ;
 
 
-    update();
 
 
-    // drive sideways to within 5in of stones
-
-    driveX    ( NORMAL_POWER                          ) ;
-    runWhile  ( OPT_DIST_XL , DIST_X_DEPOT_OUTER      ) ;
-
-    //align with 2nd stone
-
-    if (distN < DIST_Y_STONE_2) {
-      driveY  ( - CAUTIOUS_POWER                      ) ;
-      runWhile( OPT_DIST_NG, DIST_Y_STONE_2);
-    } else if (distN < DIST_Y_STONE_2) {
-      driveY  ( CAUTIOUS_POWER);
-      runWhile( OPT_DIST_NL, DIST_Y_STONE_2);
-    }
-
-    sleep(200);
-    update();
-    update();
-    l2 = lumin;
-
-    //align with first stone
-    driveY (CAUTIOUS_POWER);
-    runWhile(OPT_DIST_NL, DIST_Y_STONE_1);
-    sleep(200);
-    update();
-    update();
-    l1 = lumin;
-
-    //align with third stone
-    driveY ( - CAUTIOUS_POWER);
-    runWhile(OPT_DIST_NG, DIST_Y_STONE_3);
-    sleep(200);
-    update();
-    update();
-    l3 = lumin;
-
-    if (l2 > l1) {
-      stone = 2;
-    }
-    if (l3 > l1 && l3 > l2) {
-      stone = 3;
-    }
-
-    switch (stone) {
-      case 1:
-        driveY( - NORMAL_POWER);
-        runWhile(OPT_DIST_NG, DIST_Y_STONE_1);
-        break;
-      case 2:
-        driveY( - NORMAL_POWER);
-        runWhile(OPT_DIST_NG, DIST_Y_STONE_2);
-        break;
-      case 3:
-        sleep(1);
-        break;
-    }
-
-    // drive back for .2s
-
-    driveY    (-CAUTIOUS_POWER                        ) ;
-    runFor    ( TIME_STONE_MARGIN+850                     ) ;
-
-
-    // drive sideways to stone depot
-
-    driveX    ( CAUTIOUS_POWER                         ) ;
-    runWhile  ( OPT_DIST_XL , DIST_X_DEPOT_CENTER     ) ;
-
-
-    // drive forward for .2s
-
-    driveY    ( FULL_POWER                        ) ;
-    runFor    ( TIME_STONE_MARGIN                     ) ;
-
-
-    // grab
-
-    shouldGrab = true ;
-
-
-    // wait 1s for grabber to close
-
-    runFor    ( TIME_TOGGLE_DRABBER                   ) ;
-
-
-    // drive sideways to inner track
-
-    driveX    (-NORMAL_POWER                          ) ;
-    runWhile  ( OPT_DIST_XG , DIST_X_INTRACK_OUTER    ) ;
-
-
-    // drive back until centered on foundation's long side
-
-    driveY    (-FULL_POWER                            ) ;
-    runWhile  ( OPT_DIST_SG , DIST_Y_FOUNDATION_CENTER) ;
-
-
-    // drive sideways until touching foundation
-
-    driveX    ( NORMAL_POWER                          ) ;
-    runWhile  ( OPT_DIST_XL , DIST_X_FOUNDATION_OUTER ) ;
-
-
-    // deploy foundation grabber
-
-    shouldDrag = true ;
-    runFor    ( TIME_TOGGLE_DRABBER                   ) ;
-
-
-
-    //
-
-    // drive sideways until touching wall
-
-    driveX    (-FULL_POWER                            ) ;
-    runWhile  ( OPT_DIST_XG , DIST_X_WALL             ) ;
-
-
-    // release foundation grabber
-
-    shouldDrag = false ;
-
-    //
-
-
-    // drive forward until clear of foundation
-
-    driveY    ( NORMAL_POWER ) ;
-    runWhile  ( OPT_DIST_SL , DIST_Y_FOUNDATION_OUTER ) ;
-
-
-    // drive sideways until centered on foundation's short side
-
-    driveX    ( NORMAL_POWER ) ;
-    runWhile  ( OPT_DIST_XL , DIST_X_FOUNDATION_CENTER) ;
-
-
-    // turn 180deg
-
-    targetAngle = 180 ;
-
-    // raise slider
-
-    sliderSpn ( FULL_POWER                            ) ;
-    runFor    ( TIME_ONE_LEVEL                        ) ;
-
-
-    // drive "forward" until touching foundation's short side
-
-    driveY    ( CAUTIOUS_POWER                        ) ;
-    runFor    ( TIME_FOUNDATION_MARGIN                ) ;
-
-
-    // release
-
-    shouldGrab = false ;
-
-
-    // drive "backward"
-
-    driveY    (-NORMAL_POWER                          ) ;
-    runFor    ( TIME_FOUNDATION_MARGIN                ) ;
-
-    shouldGrab = true ;
-
-
-    // lower slider
-
-    sliderSpn (-FULL_POWER                            ) ;
-    runFor    ( TIME_ONE_LEVEL                        ) ;
-
-
-    // turn 180deg
-
-    targetAngle = 0 ;
-    runFor    ( TIME_ONE_TURN                         ) ;
-
-
-    // drive sideways to inner track
-
-    driveX    (-NORMAL_POWER                          ) ;
-    runWhile  ( OPT_DIST_XG , DIST_X_INTRACK_OUTER    ) ;
-
-
-    // drive forward to under bridge
-
-    driveY    ( FULL_POWER                            ) ;
-    runWhile  ( OPT_DIST_SL , DIST_Y_SKYBRIDGE        ) ;
   }
 }

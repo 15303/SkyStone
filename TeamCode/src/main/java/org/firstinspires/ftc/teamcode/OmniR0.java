@@ -228,11 +228,15 @@ public class OmniR0 extends LinearOpMode {
 
   }
 
+  private int getDeltaAngle( ){
+    int currentAngle = (int) imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
+    return targetAngle - currentAngle;
+  }
+
 
   private void update () {
 
     drab();
-
 
     time = getRuntime() * 1000;
 
@@ -242,23 +246,13 @@ public class OmniR0 extends LinearOpMode {
     lumin = (lumin + Math.max(senseColor.red(), Math.max(senseColor.green(), senseColor.blue()))) / 2;
 
 
-//    angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-//
-//    currentAngle = (int) angles.firstAngle;
-//
-//    deltaAngle = targetAngle - currentAngle;
-//    absDeltaAngle = Math.abs(deltaAngle);
-//
-//    if (absDeltaAngle > 5) {
-//
-//      turnPower = absDeltaAngle > 60 ? FULL_POWER
-//              : absDeltaAngle > 30 ? NORMAL_POWER
-//              : absDeltaAngle > 15 ? CAUTIOUS_POWER
-//              : CAUTIOUS_POWER / 3;
-//
-//      driveSpn(Math.signum(-deltaAngle) * turnPower);
-//
-//    }
+    while( Math.abs(getDeltaAngle()) > 2 )
+
+      if (absDeltaAngle > 5) {
+  
+        driveSpn(Math.signum(-deltaAngle) * 0.1);
+
+      }
 
     telemetry.addData("distN", distN);
     telemetry.addData("distX", distX);
