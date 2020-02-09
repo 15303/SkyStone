@@ -34,8 +34,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous (
 
-  name  = 'OmniR0'         ,
-  group = 'r2'
+  name  = "OmniR0"         ,
+  group = "r2"
 
 )
 
@@ -62,7 +62,7 @@ public class OmniR0 extends LinearOpMode {
   private ColorSensor     sensorColor    = null ;
   private DistanceSensor  sensorDistance = null ;
   
-  String task = 'go to stones';
+  String task =  "get ambient measurements";
 
   BNO055IMU imu;
 
@@ -71,6 +71,7 @@ public class OmniR0 extends LinearOpMode {
 
   double distance       = 100 ;
   double brightness     = 800 ;
+  double ambientBrightness;
   double time           =   0 ;
 
   int orientation       = 0 ;
@@ -140,11 +141,11 @@ public class OmniR0 extends LinearOpMode {
 
     if ( shouldGrab ) {
 
-      grabber.setPosition ( 1 ) ;
+      grabber.setPosition ( 0 ) ;
 
     } else {
 
-      grabber.setPosition ( 0   ) ;
+      grabber.setPosition ( 1 ) ;
 
     }
 
@@ -165,12 +166,14 @@ public class OmniR0 extends LinearOpMode {
     brightness  = sensorColor.red() + sensorColor.green() + sensorColor.blue();
     distance    = sensorDistance.getDistance(DistanceUnit.INCH);
     orientation = (int) imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
-    time        = runtime.seconds()
+    time        = runtime.seconds();
     
-    telemetry.addData( 'distance',    distance    );
-    telemetry.addData( 'brightness',  brightness  );
-    telemetry.addData( 'orientation', orientation );
-    telemetry.addData( 'current task',task       );
+    telemetry.addData( "distance",    distance    );
+    telemetry.addData( "brightness",  brightness  );
+    telemetry.addData( "relative brightness",  brightness/ambientBrightness  );
+    telemetry.addData( "orientation", orientation );
+    telemetry.addData( "current task",task       );
+    telemetry.addData( "time",time       );
     telemetry.update();
     
   }
@@ -180,104 +183,105 @@ public class OmniR0 extends LinearOpMode {
     runtime.reset();
     
   }
-  
-  private void correctRotation () {
-    
-    deltaOrientation = targetOrientation - orientation;
-
-    if ( Math.abs( deltaOrientation ) > 2 )
-  
-      driveSpn ( Math.signum ( -deltaOrientation ) * 0.1 );
-
-    }
-    
-  }
 
   private void run () {
     
     updateSensors();
     updateServos();
-    correctOrientation();
-    
-    if ( task == 'go to stones' ) {
-      
-      driveX ( 0.5 )
-      
-      if ( distance < 5 ) {
-        
-        task = 'find skystone';
-        
+
+    if ( task == "get ambient measurements" ) {
+
+      if ( time > 2 ) {
+
+        resetTime();
+
+        ambientBrightness = brightness;
+
+        task = "go to stones far";
+
       }
+
+    } else if ( task == "go to stones far" ) {
+
+      driveX ( 1 );
+
+      if ( time > 2 ) {
+
+        resetTime();
+
+        task = "go to stones near";
+
+      }
+
+    } else if ( task == "go to stones near" ) {
+
+      driveX ( 0.4 );
+
+      if ( distance < 1.5 ) {
+
+        task = "find skystone";
+
+      }
+
+    } else if ( task == "find skystone" ) {
       
-    }
-    
-    if ( task == 'find skystone' ) {
+      driveY ( 0.5 );
       
-      driveY ( 0.5 )
-      
-      if ( brightness < 600 ) {
+      if ( brightness < 2.5 * ambientBrightness ) {
         
         resetTime();
         
-        task = 'go adjacent to stone behind skystone';
+        task = "go adjacent to stone behind skystone";
         
       }
       
-    }
-    
-    if ( task == 'go adjacent to skystone' ) {
+    } else if ( task == "go adjacent to skystone" ) {
       
-      driveY ( -0.5 )
+      driveY ( -0.5 );
       
       if ( time > 1 ) {
         
         resetTime();
         
-        task = 'push out stone behind skystone';
+        task = "push out stone behind skystone";
         
         shouldGrab = false;
         
       }
       
-    }
-    
-    if ( task == 'push out stone behind skystone' ) {
+    } else if ( task == "push out stone behind skystone" ) {
       
-      driveX ( 0.5 )
+      driveX ( 0.5 );
       
       if ( time > 1 ) {
         
         resetTime();
         
-        task = 'go towards skystone';
+        task = "go towards skystone";
         
       }
       
-    }
-    
-    if ( task == 'go towards skystone' ) {
+    } else if ( task == "go towards skystone" ) {
       
-      driveY ( 0.5 )
+      driveY ( 0.5 );
       
       if ( time > 2 ) {
         
         resetTime();
         
-        task = 'grab skystone';
+        task = "grab skystone";
         
         shouldGrab = true;
         
       }
       
-    }
-    
-    if ( task == 'grab skystone' ) {
+    } else if ( task == "grab skystone" ) {
 
       if ( time > 2 ) {
         
         resetTime();
         
-        task = 'go to outer ';
+        task = "go to outer ";
         
       }
       
@@ -291,33 +295,32 @@ public class OmniR0 extends LinearOpMode {
   }
 
   String formatDegrees(double degrees){
-    return String.format(Locale.getDefault(), '%.1f', AngleUnit.DEGREES.normalize(degrees));
+    return String.format(Locale.getDefault(), "%.1f", AngleUnit.DEGREES.normalize(degrees));
   }
   
   public void initialize () {
     
-    driveNW    = hardwareMap.get ( DcMotor.class , 'driveNW' ) ;
-    driveNE    = hardwareMap.get ( DcMotor.class , 'driveNE' ) ;
-    driveSE    = hardwareMap.get ( DcMotor.class , 'driveSE' ) ;
-    driveSW    = hardwareMap.get ( DcMotor.class , 'driveSW' ) ;
+    driveNW    = hardwareMap.get ( DcMotor.class , "driveNW" ) ;
+    driveNE    = hardwareMap.get ( DcMotor.class , "driveNE" ) ;
+    driveSE    = hardwareMap.get ( DcMotor.class , "driveSE" ) ;
+    driveSW    = hardwareMap.get ( DcMotor.class , "driveSW" ) ;
 
-    slider     = hardwareMap.get ( DcMotor.class , 'slider'  ) ;
-    grabber    = hardwareMap.get ( Servo.class   , 'grabber' ) ;
-    dragger    = hardwareMap.get ( Servo.class   , 'dragger' ) ;
+    slider     = hardwareMap.get ( DcMotor.class , "slider"  ) ;
+    grabber    = hardwareMap.get ( Servo.class   , "grabber" ) ;
+    dragger    = hardwareMap.get ( Servo.class   , "dragger" ) ;
 
-    sensorColor    = isRed ? hardwareMap.get ( ColorSensor.class    , 'sensorE' ) : ( ColorSensor.class    , 'sensorW' ) ;
-    sensorDistance = isRed ? hardwareMap.get ( DistanceSensor.class , 'sensorE' ) : ( DistanceSensor.class , 'sensorW' ) ;
+    sensorColor    = isRed ? hardwareMap.get ( ColorSensor.class    , "sensorW" ) : hardwareMap.get ( ColorSensor.class    , "sensorE" ) ;
+    sensorDistance = isRed ? hardwareMap.get ( DistanceSensor.class , "sensorW" ) : hardwareMap.get ( DistanceSensor.class , "sensorE" ) ;
 
 
     BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
     parameters.angleUnit            = BNO055IMU.AngleUnit.DEGREES;
     parameters.accelUnit            = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-    parameters.calibrationDataFile  = 'BNO055IMUCalibration.json'; // see the calibration sample opmode
     parameters.loggingEnabled       = true;
-    parameters.loggingTag           = 'IMU';
+    parameters.loggingTag           = "IMU";
     parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
-    imu = hardwareMap.get(BNO055IMU.class, 'imu');
+    imu = hardwareMap.get(BNO055IMU.class, "imu");
     imu.initialize(parameters);
     
   }
