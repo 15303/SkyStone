@@ -19,8 +19,8 @@ import java.util.Locale;
 
 @Autonomous (
 
-  name  = "OmniP"         ,
-  group = "r2"
+  name  = "OmniPark"         ,
+  group = "2"
 
 )
 
@@ -28,7 +28,7 @@ import java.util.Locale;
 
 
 
-public class OmniP extends LinearOpMode {
+public class OmniPark extends LinearOpMode {
 
 
   boolean isRed = true ; // IMPORTANT

@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.util.Range;
 @TeleOp (
 
   name  = "OmniX"         ,
-  group = "r2"
+  group = "2"
 
 )
 
