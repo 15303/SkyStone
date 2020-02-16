@@ -1,32 +1,31 @@
 package org.firstinspires.ftc.teamcode.omni;
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode ;
-import com.qualcomm.robotcore.hardware.DcMotor ;
-import com.qualcomm.robotcore.hardware.Servo ;
-import com.qualcomm.robotcore.hardware.DistanceSensor ;
-import com.qualcomm.robotcore.hardware.ColorSensor ;
-import com.qualcomm.robotcore.util.ElapsedTime ;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit ;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
-import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous (
 
-        name  = "OmniFoundR"         ,
+        name  = "OmniFoundB"         ,
         group = "2"
 
 )
 
-public class OmniFoundR extends LinearOpMode {
+public class OmniFoundB extends LinearOpMode {
 
 
-  boolean isRed = true;
+  boolean isRed = false;
   boolean isSkystone = false;
 
   private ElapsedTime runtime = new ElapsedTime() ;

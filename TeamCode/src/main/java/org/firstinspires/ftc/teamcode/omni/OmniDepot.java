@@ -1,36 +1,19 @@
 package org.firstinspires.ftc.teamcode.omni;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled ;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode ;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous ;
 import com.qualcomm.robotcore.hardware.DcMotor ;
 import com.qualcomm.robotcore.hardware.Servo ;
 import com.qualcomm.robotcore.hardware.DistanceSensor ;
 import com.qualcomm.robotcore.hardware.ColorSensor ;
 import com.qualcomm.robotcore.util.ElapsedTime ;
-import com.qualcomm.robotcore.util.Range ;
-
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit ;
-import java.util.Locale ;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcore.external.Func;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
-import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous (
@@ -39,9 +22,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
   group = "2"
 
 )
-
-// @Disabled
-
 
 public class OmniDepot extends LinearOpMode {
 
@@ -65,9 +45,6 @@ public class OmniDepot extends LinearOpMode {
   String task =  "initialize";
 
   BNO055IMU imu;
-
-  Orientation angles;
-  Acceleration gravity;
 
   String[] motorNames = {
           "driveNW",
@@ -129,13 +106,12 @@ public class OmniDepot extends LinearOpMode {
     activeSleep(ms);
 
   }
-
   
   private double maxOf ( double[] array ) {
     
-    double maxValue = Math.abs(array[0]);
+    double maxValue = 1;
     
-    for ( int i = 1 ; i < array.length ; i++ ){
+    for ( int i = 0 ; i < array.length ; i++ ){
 
       double newValue = Math.abs(array[i]);
       
@@ -152,7 +128,7 @@ public class OmniDepot extends LinearOpMode {
   }
 
 
-  private void sliderSpn ( double power ) {
+  private void lift ( double power ) {
 
     slider.setPower  (  power ) ;
 
@@ -177,7 +153,7 @@ public class OmniDepot extends LinearOpMode {
       
     }
 
-    double max = Math.max(maxOf(adjustedPowers),1);
+    double max = maxOf(adjustedPowers);
 
     for ( int i = 0 ; i < 4 ; i++ ){
 
@@ -309,8 +285,6 @@ public class OmniDepot extends LinearOpMode {
 
   private void run () {
 
-
-
     setTask("go to stones far");
 
     drive ( "X" , 1 , 1000);
@@ -357,28 +331,23 @@ public class OmniDepot extends LinearOpMode {
 
     setTask("grab skystone");
 
-    activeSleep(2000);
+    drive("0",0,2000);
 
-    setTask("go to outer ");
+    setTask("go to inner");
 
-    drive("X",-1,2000);
+    drive("X",-1,1000);
 
     setTask("drive to foundation");
 
     drive("Y",1,3000);
 
+    grab(false);
+
+    drive("Y",-1,500);
+
     setTask("end");
 
   }
-
-  String formatAngle(AngleUnit angleUnit, double angle) {
-    return formatDegrees(AngleUnit.DEGREES.fromUnit(angleUnit, angle));
-  }
-
-  String formatDegrees(double degrees){
-    return String.format(Locale.getDefault(), "%.1f", AngleUnit.DEGREES.normalize(degrees));
-  }
-
 
   @Override
   public void runOpMode () {
