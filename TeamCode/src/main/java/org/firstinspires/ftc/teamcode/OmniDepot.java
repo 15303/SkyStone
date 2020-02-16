@@ -50,14 +50,9 @@ public class OmniDepot extends LinearOpMode {
   
   private ElapsedTime runtime = new ElapsedTime() ;
 
-  private DcMotor driveNW = null ;
-  private DcMotor driveNE = null ;
-  private DcMotor driveSE = null ;
-  private DcMotor driveSW = null ;
-  private DcMotor slider  = null ;
-  
   private Servo   grabber = null ;
   private Servo   dragger = null ;
+  private DcMotor slider = null;
 
   private DistanceSensor sensorRDistance = null;
   private DistanceSensor sensorLDistance = null;
@@ -74,21 +69,24 @@ public class OmniDepot extends LinearOpMode {
   Orientation angles;
   Acceleration gravity;
 
+  String[] motorNames = {
+          "driveNW",
+          "driveNE",
+          "driveSE",
+          "driveSW"
+  };
+  private DcMotor[] motors = {null,null,null,null};
+  double[] targetPowers = {0,0,0,0};
+  double[] adjustedPowers = {0,0,0,0};
+  double[] normalizedPowers = {0,0,0,0};
+
   double distance       = 0 ;
   double stoneBrightness = 0 ;
   double ambientBrightness = 0;
 
-  double targetNW = 0;
-  double targetNE = 0;
-  double targetSE = 0;
-  double targetSW = 0;
   double targetOrientation = 0;
 
   double orientation       = 0 ;
-
-  boolean shouldGrab = true ;
-  boolean shouldDrag = false ;
-
 
   private void driveX ( double power ) {
 
@@ -100,10 +98,10 @@ public class OmniDepot extends LinearOpMode {
 
     }
 
-    targetNW = -power;
-    targetNE = -power;
-    targetSE = power ;
-    targetSW = power ;
+    targetPowers[0] = -power;
+    targetPowers[1] = -power;
+    targetPowers[2] = power ;
+    targetPowers[3] = power ;
 
   }
 
@@ -112,10 +110,10 @@ public class OmniDepot extends LinearOpMode {
 
     // drive toward stones
 
-    targetNW = -power;
-    targetNE = power;
-    targetSE = power ;
-    targetSW = -power ;
+    targetPowers[0] = -power;
+    targetPowers[1] = power;
+    targetPowers[2] = power ;
+    targetPowers[3] = -power ;
 
   }
 
@@ -130,11 +128,30 @@ public class OmniDepot extends LinearOpMode {
 
     }
 
-    targetNW = power;
-    targetNE = power;
-    targetSE = power ;
-    targetSW = power ;
+    for ( int i = 0 ; i < 4 ; i++ ){
+      
+      targetPowers[i] = power;
+      
+    }
 
+  }
+  
+  private double maxOf ( double[] array ) {
+    
+    double maxValue = array[0];
+    
+    for ( int i = 0 ; i < array.length ; i++ ){
+      
+      if( array[i] > maxValue ){
+        
+        maxValue = array[i];
+        
+      }
+      
+    }
+    
+    return maxValue;
+    
   }
 
 
@@ -148,22 +165,29 @@ public class OmniDepot extends LinearOpMode {
 
     double orientationAdjustment = ( targetOrientation - orientation ) / 30;
 
-    targetNW += orientationAdjustment;
-    targetNE += orientationAdjustment;
-    targetSE += orientationAdjustment;
-    targetSW += orientationAdjustment;
+    for ( int i = 0 ; i < 4 ; i++ ){
+      
+      adjustedPowers[i] = targetPowers[i] + orientationAdjustment;
+      
+    }
 
-    double normalize = Math.max(Math.max(Math.max(Math.abs(targetNW),Math.abs(targetNE)),Math.max(Math.abs(targetSE),Math.abs(targetSW))),1);
+    double max = Math.max(maxOf(adjustedPowers),1);
 
-    driveNW.setPower(targetNW/normalize);
-    driveNE.setPower(targetNE/normalize);
-    driveSE.setPower(targetSE/normalize);
-    driveSW.setPower(targetSW/normalize);
+    for ( int i = 0 ; i < 4 ; i++ ){
 
+      normalizedPowers[i] = targetPowers[i]/max;
+
+    }
+
+    for ( int i = 0 ; i < 4 ; i++ ){
+
+      motors[i].setPower(normalizedPowers[i]);
+      
+    }
+    
   }
 
-
-  private void updateServos () {
+  private void grab ( boolean shouldGrab ) {
 
     if ( shouldGrab ) {
 
@@ -175,18 +199,8 @@ public class OmniDepot extends LinearOpMode {
 
     }
 
-    if ( shouldDrag ) {
-
-      dragger.setPosition ( 1 ) ;
-
-    } else {
-
-      dragger.setPosition ( 0   ) ;
-
-    }
-
   }
-  
+
   private void updateSensors () {
 
     stoneBrightness  = sensorStoneBrightness.red() + sensorStoneBrightness.green() + sensorStoneBrightness.blue();
@@ -194,30 +208,72 @@ public class OmniDepot extends LinearOpMode {
     distance    = sensorDistance.getDistance(DistanceUnit.INCH);
     orientation = (int) imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
 
-    telemetry.addData( "team",isRed ? "red" : "blue"       );
-    telemetry.addData( "current task",task       );
-    telemetry.addData( "distance",    distance    );
-    telemetry.addData( "stone brightness",  stoneBrightness  );
-    telemetry.addData( "relative brightness",  stoneBrightness/ambientBrightness  );
-    telemetry.addData( "orientation", orientation );
-    telemetry.addData( "time",runtime.seconds());
+    telemetry.addData(
+      "team",
+      isRed ? "red" : "blue"
+    );
+    telemetry.addData(
+      "current task",
+      task
+    );
+    telemetry.addData(
+      "distance",
+      distance
+    );
+    telemetry.addData(
+      "stone brightness",
+      stoneBrightness
+    );
+    telemetry.addData(
+      "relative brightness",
+      stoneBrightness/ambientBrightness
+    );
+    telemetry.addData(
+      "orientation",
+      orientation
+    );
+    telemetry.addData(
+      "time",
+      runtime.seconds()
+    );
     telemetry.update();
 
   }
 
-  private void reset () {
+  private void retime () {
+
+    runtime.reset();
+
+  }
+
+  private void activeSleep (double ms) {
+
+    retime();
+
+    while (runtime.seconds() < ms/1000) {
+
+      updateSensors();
+      updateMotors();
+
+    }
+
+  }
+
+  private void pause () {
 
     driveX(0);
-    runtime.reset();
+    sleep(150);
+    retime();
 
   }
 
   private void initialize () {
 
-    driveNW    = hardwareMap.get ( DcMotor.class , "driveNW" ) ;
-    driveNE    = hardwareMap.get ( DcMotor.class , "driveNE" ) ;
-    driveSE    = hardwareMap.get ( DcMotor.class , "driveSE" ) ;
-    driveSW    = hardwareMap.get ( DcMotor.class , "driveSW" ) ;
+    for ( int i = 0 ; i < 4 ; i++ ){
+
+      motors[i] = hardwareMap.get ( DcMotor.class , motorNames[i] ) ;
+
+    }
 
     slider     = hardwareMap.get ( DcMotor.class , "slider"  ) ;
     grabber    = hardwareMap.get ( Servo.class   , "grabber" ) ;
@@ -248,121 +304,88 @@ public class OmniDepot extends LinearOpMode {
 
   private void run () {
 
-    if ( task == "go to stones far" ) {
 
-      driveX ( 1 );
 
-      if ( runtime.seconds() > 0.7 ) {
+    task = "go to stones far";
 
-        reset();
+    driveX ( 1 );
 
-        shouldGrab = false;
+    activeSleep(700);
 
-        task = "go to stones near";
+    grab(false);
 
-      }
 
-    } else if ( task == "go to stones near" ) {
+
+    task = "go to stones near";
+
+    while ( distance < 2.5 ) {
 
       driveX ( 0.3 );
 
-      if ( distance < 2.5 ) {
+    }
 
-        reset();
 
-        task = "align with wall";
 
-      }
+    task = "align with wall";
 
-    } else if ( task == "align with wall") {
+    driveY (-0.5);
 
-      driveY (-0.5);
+    activeSleep(1000);
 
-      if(runtime.seconds() > 1){
 
-        reset();
 
-        task = "align with 3rd stone";
+    task = "align with 3rd stone";
 
-      }
+    driveY ( 0.5 );
 
-    }else if ( task == "align with 3rd stone"){
+    activeSleep(1000);
 
-      driveY ( 0.5 );
+    task = "find skystone";
 
-      if(runtime.seconds() > 1){
 
-        reset();
 
-        task = "find skystone";
+    retime();
 
-      }
-
-    } else if ( task == "find skystone" ) {
+    while ( stoneBrightness > (3 * ambientBrightness) && runtime.seconds() < 5) {
 
       driveY ( 0.3 );
 
-      if ( stoneBrightness < 3 * ambientBrightness ) {
-
-        reset();
-
-        task = "go adjacent to stone behind skystone";
-
-      }
-
-    } else if ( task == "go adjacent to stone behind skystone" ) {
-
-      driveY ( -0.5 );
-
-      if ( runtime.seconds() > 1 ) {
-
-        reset();
-
-        task = "push out stone behind skystone";
-
-      }
-
-    } else if ( task == "push out stone behind skystone" ) {
-
-      driveX ( 1 );
-
-      if ( runtime.seconds() > 1 ) {
-
-        reset();
-
-        task = "go towards skystone";
-
-      }
-
-    } else if ( task == "go towards skystone" ) {
-
-      driveY ( 0.5 );
-
-      if ( runtime.seconds() > 2 ) {
-
-        reset();
-
-        task = "grab skystone";
-
-        shouldGrab = true;
-
-      }
-
-    } else if ( task == "grab skystone" ) {
-
-      if ( runtime.seconds() > 2 ) {
-
-        reset();
-
-        task = "go to outer ";
-
-      }
-
     }
-    
-    updateSensors();
-    updateServos();
-    updateMotors();
+
+    pause();
+
+
+    task = "go adjacent to stone behind skystone";
+
+    driveY ( -0.5 );
+
+    activeSleep(1000);
+
+
+
+    task = "push out stone behind skystone";
+
+    driveX ( 1 );
+
+    activeSleep(1000);
+
+
+
+    task = "go towards skystone";
+
+    driveY ( 0.5 );
+
+    activeSleep(2000);
+
+    grab(true);
+
+
+
+    task = "grab skystone" ;
+
+    activeSleep(2000);
+
+    task = "go to outer ";
 
   }
 
@@ -382,13 +405,7 @@ public class OmniDepot extends LinearOpMode {
 
     waitForStart();
 
-    reset();
-
-    while ( opModeIsActive () ) {
-     
-      run();
-    
-    }
+    run();
 
   }
 }
