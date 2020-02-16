@@ -1,30 +1,34 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.omni;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
-import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+
+import java.util.Locale;
 
 @Autonomous (
 
-  name  = "Omnicmgy.oyimutestP"         ,
+  name  = "OmniPark"         ,
   group = "2"
 
 )
 
- @Disabled
+// @Disabled
 
 
 
-public class Omniimutest extends LinearOpMode {
+public class OmniPark extends LinearOpMode {
 
 
   boolean isRed = true ; // IMPORTANT
@@ -37,13 +41,6 @@ public class Omniimutest extends LinearOpMode {
   private DcMotor         driveSE = null ;
   private DcMotor         driveSW = null ;
 
-  BNO055IMU imu;
-
-  // State used for updating telemetry
-  Orientation angles;
-  Acceleration gravity;
-  Position position;
-
 
   private void driveY ( double power ) {
 
@@ -55,17 +52,7 @@ public class Omniimutest extends LinearOpMode {
     driveSW.setPower ( -power ) ;
 
   }
-
   public void runOpMode(){
-    BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-    parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-    parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-    parameters.loggingEnabled      = true;
-    parameters.loggingTag          = "IMU";
-    parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
-
-    imu = hardwareMap.get(BNO055IMU.class, "imu");
-    imu.initialize(parameters);
 
     driveNW    = hardwareMap.get ( DcMotor.class ,       "driveNW" ) ;
     driveNE    = hardwareMap.get ( DcMotor.class ,       "driveNE" ) ;
@@ -73,12 +60,6 @@ public class Omniimutest extends LinearOpMode {
     driveSW    = hardwareMap.get ( DcMotor.class ,       "driveSW" ) ;
 
     waitForStart();
-
-    imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
-    while (opModeIsActive()) {
-      telemetry.addData("gravity", imu.getGravity());
-      telemetry.update();
-    }
 
     driveY(1);
     sleep(1000);

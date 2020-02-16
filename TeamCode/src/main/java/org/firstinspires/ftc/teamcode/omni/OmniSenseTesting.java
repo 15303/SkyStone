@@ -1,17 +1,5 @@
-package org.firstinspires.ftc.teamcode ;
+package org.firstinspires.ftc.teamcode.omni;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled ;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode ;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous ;
-import com.qualcomm.robotcore.hardware.DcMotor ;
-import com.qualcomm.robotcore.hardware.Servo ;
-import com.qualcomm.robotcore.hardware.DistanceSensor ;
-import com.qualcomm.robotcore.hardware.ColorSensor ;
-import com.qualcomm.robotcore.util.ElapsedTime ;
-import com.qualcomm.robotcore.util.Range ;
-
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit ;
-import java.util.Locale ;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -22,20 +10,19 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.Func;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
-import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+
+import java.util.Locale;
 
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous (
+@Autonomous (
 
-  name  = "OmniDepot"         ,
+  name  = "OmniSenseTesting"         ,
   group = "2"
 
 )
@@ -43,10 +30,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 // @Disabled
 
 
-public class OmniDepot extends LinearOpMode {
+public class OmniSenseTesting extends LinearOpMode {
 
 
-  boolean isRed;
+  boolean isRed = true;
+  boolean isSkystone = false;
   
   private ElapsedTime runtime = new ElapsedTime() ;
 
@@ -57,11 +45,10 @@ public class OmniDepot extends LinearOpMode {
   private DistanceSensor sensorRDistance = null;
   private DistanceSensor sensorLDistance = null;
   private DistanceSensor sensorDistance = null;
-  private ColorSensor sensorRBrightness = null;
-  private ColorSensor sensorLBrightness = null;
-  private ColorSensor sensorStoneBrightness = null;
-  private ColorSensor sensorAmbientBrightness = null;
-  
+  private ColorSensor sensorRColor = null;
+  private ColorSensor sensorLColor = null;
+  private ColorSensor sensorColor = null;
+
   String task =  "go to stones far";
 
   BNO055IMU imu;
@@ -81,8 +68,6 @@ public class OmniDepot extends LinearOpMode {
   double[] normalizedPowers = {0,0,0,0};
 
   double distance       = 0 ;
-  double stoneBrightness = 0 ;
-  double ambientBrightness = 0;
 
   double targetOrientation = 0;
 
@@ -138,13 +123,15 @@ public class OmniDepot extends LinearOpMode {
   
   private double maxOf ( double[] array ) {
     
-    double maxValue = array[0];
+    double maxValue = Math.abs(array[0]);
     
-    for ( int i = 0 ; i < array.length ; i++ ){
+    for ( int i = 1 ; i < array.length ; i++ ){
+
+      double newValue = Math.abs(array[i]);
       
-      if( array[i] > maxValue ){
+      if( newValue > maxValue ){
         
-        maxValue = array[i];
+        maxValue = newValue;
         
       }
       
@@ -163,7 +150,7 @@ public class OmniDepot extends LinearOpMode {
 
   private void updateMotors () {
 
-    double orientationAdjustment = ( targetOrientation - orientation ) / 30;
+    double orientationAdjustment = ( targetOrientation - orientation ) / 60;
 
     for ( int i = 0 ; i < 4 ; i++ ){
       
@@ -175,7 +162,7 @@ public class OmniDepot extends LinearOpMode {
 
     for ( int i = 0 ; i < 4 ; i++ ){
 
-      normalizedPowers[i] = targetPowers[i]/max;
+      normalizedPowers[i] = adjustedPowers[i]/max;
 
     }
 
@@ -203,39 +190,14 @@ public class OmniDepot extends LinearOpMode {
 
   private void updateSensors () {
 
-    stoneBrightness  = sensorStoneBrightness.red() + sensorStoneBrightness.green() + sensorStoneBrightness.blue();
-    ambientBrightness  = sensorAmbientBrightness.red() + sensorAmbientBrightness.green() + sensorAmbientBrightness.blue();
+    isSkystone  = sensorColor.red() + sensorColor.green() < 2 * sensorColor.blue();
     distance    = sensorDistance.getDistance(DistanceUnit.INCH);
     orientation = (int) imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
 
-    telemetry.addData(
-      "team",
-      isRed ? "red" : "blue"
+    telemetry.addData("red+green", sensorColor.red() + sensorColor.blue()
+
     );
-    telemetry.addData(
-      "current task",
-      task
-    );
-    telemetry.addData(
-      "distance",
-      distance
-    );
-    telemetry.addData(
-      "stone brightness",
-      stoneBrightness
-    );
-    telemetry.addData(
-      "relative brightness",
-      stoneBrightness/ambientBrightness
-    );
-    telemetry.addData(
-      "orientation",
-      orientation
-    );
-    telemetry.addData(
-      "time",
-      runtime.seconds()
-    );
+    telemetry.addData("blue * 2", 2 * sensorColor.blue());
     telemetry.update();
 
   }
@@ -250,7 +212,7 @@ public class OmniDepot extends LinearOpMode {
 
     retime();
 
-    while (runtime.seconds() < ms/1000) {
+    while (opModeIsActive() && runtime.seconds() < ms/1000) {
 
       updateSensors();
       updateMotors();
@@ -262,7 +224,7 @@ public class OmniDepot extends LinearOpMode {
   private void pause () {
 
     driveX(0);
-    sleep(150);
+    sleep(1000);
     retime();
 
   }
@@ -281,8 +243,8 @@ public class OmniDepot extends LinearOpMode {
 
     sensorLDistance = hardwareMap.get ( DistanceSensor.class ,"sensorL" );
     sensorRDistance = hardwareMap.get ( DistanceSensor.class ,"sensorR" );
-    sensorLBrightness = hardwareMap.get ( ColorSensor.class ,"sensorL" );
-    sensorRBrightness = hardwareMap.get ( ColorSensor.class ,"sensorR" );
+    sensorLColor = hardwareMap.get ( ColorSensor.class ,"sensorL" );
+    sensorRColor = hardwareMap.get ( ColorSensor.class ,"sensorR" );
 
     BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
     parameters.angleUnit            = BNO055IMU.AngleUnit.DEGREES;
@@ -297,8 +259,7 @@ public class OmniDepot extends LinearOpMode {
     isRed = sensorRDistance.getDistance(DistanceUnit.INCH) < sensorLDistance.getDistance(DistanceUnit.INCH);
 
     sensorDistance = isRed ? sensorLDistance : sensorRDistance;
-    sensorAmbientBrightness = isRed ? sensorRBrightness : sensorLBrightness;
-    sensorStoneBrightness = isRed ? sensorLBrightness : sensorRBrightness;
+    sensorColor = isRed ? sensorLColor : sensorRColor;
 
   }
 
@@ -306,86 +267,7 @@ public class OmniDepot extends LinearOpMode {
 
 
 
-    task = "go to stones far";
-
-    driveX ( 1 );
-
-    activeSleep(700);
-
-    grab(false);
-
-
-
-    task = "go to stones near";
-
-    while ( distance < 2.5 ) {
-
-      driveX ( 0.3 );
-
-    }
-
-
-
-    task = "align with wall";
-
-    driveY (-0.5);
-
-    activeSleep(1000);
-
-
-
-    task = "align with 3rd stone";
-
-    driveY ( 0.5 );
-
-    activeSleep(1000);
-
-    task = "find skystone";
-
-
-
-    retime();
-
-    while ( stoneBrightness > (3 * ambientBrightness) && runtime.seconds() < 5) {
-
-      driveY ( 0.3 );
-
-    }
-
-    pause();
-
-
-    task = "go adjacent to stone behind skystone";
-
-    driveY ( -0.5 );
-
-    activeSleep(1000);
-
-
-
-    task = "push out stone behind skystone";
-
-    driveX ( 1 );
-
-    activeSleep(1000);
-
-
-
-    task = "go towards skystone";
-
-    driveY ( 0.5 );
-
-    activeSleep(2000);
-
-    grab(true);
-
-
-
-    task = "grab skystone" ;
-
-    activeSleep(2000);
-
-    task = "go to outer ";
+    activeSleep(30000);
 
   }
 

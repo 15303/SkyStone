@@ -1,5 +1,17 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.omni;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled ;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode ;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous ;
+import com.qualcomm.robotcore.hardware.DcMotor ;
+import com.qualcomm.robotcore.hardware.Servo ;
+import com.qualcomm.robotcore.hardware.DistanceSensor ;
+import com.qualcomm.robotcore.hardware.ColorSensor ;
+import com.qualcomm.robotcore.util.ElapsedTime ;
+import com.qualcomm.robotcore.util.Range ;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit ;
+import java.util.Locale ;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -10,19 +22,20 @@ import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Func;
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
-import java.util.Locale;
 
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous (
 
-@Autonomous (
-
-  name  = "OmniFound"         ,
+  name  = "OmniDepot"         ,
   group = "2"
 
 )
@@ -30,10 +43,11 @@ import java.util.Locale;
 // @Disabled
 
 
-public class OmniFound extends LinearOpMode {
+public class OmniDepot extends LinearOpMode {
 
 
-  boolean isRed;
+  boolean isRed = true;
+  boolean isSkystone = false;
   
   private ElapsedTime runtime = new ElapsedTime() ;
 
@@ -44,12 +58,11 @@ public class OmniFound extends LinearOpMode {
   private DistanceSensor sensorRDistance = null;
   private DistanceSensor sensorLDistance = null;
   private DistanceSensor sensorDistance = null;
-  private ColorSensor sensorRBrightness = null;
-  private ColorSensor sensorLBrightness = null;
-  private ColorSensor sensorStoneBrightness = null;
-  private ColorSensor sensorAmbientBrightness = null;
-  
-  String task =  "go to stones far";
+  private ColorSensor sensorRColor = null;
+  private ColorSensor sensorLColor = null;
+  private ColorSensor sensorColor = null;
+
+  String task =  "initialize";
 
   BNO055IMU imu;
 
@@ -68,70 +81,67 @@ public class OmniFound extends LinearOpMode {
   double[] normalizedPowers = {0,0,0,0};
 
   double distance       = 0 ;
-  double stoneBrightness = 0 ;
-  double ambientBrightness = 0;
 
   double targetOrientation = 0;
 
   double orientation       = 0 ;
 
-  private void driveX ( double power ) {
+  private void drive ( String direction , double power ) {
 
-    // drive away from drivers
+    if ( direction == "X" ) {
 
-    if ( isRed ) {
+      // drive away from drivers
 
-      power = -power ;
+      if ( isRed ) {
 
-    }
+        power = -power ;
 
-    targetPowers[0] = -power;
-    targetPowers[1] = -power;
-    targetPowers[2] = power ;
-    targetPowers[3] = power ;
+      }
 
-  }
+      setTargetPowers(-power,-power,power,power);
 
+    } else if ( direction == "Y" ) {
 
-  private void driveY ( double power ) {
+      // drive toward stones
 
-    // drive toward stones
+      setTargetPowers(-power,power,power,-power);
 
-    targetPowers[0] = -power;
-    targetPowers[1] = power;
-    targetPowers[2] = power ;
-    targetPowers[3] = -power ;
+    } else if ( direction == "Spin" ) {
 
-  }
+      // spin clockwise red , cc blue
 
+      if( isRed ) {
 
-  private void driveSpn ( double power ) {
+        power = -power ;
 
-    // spin clockwise red , cc blue
+      }
 
-    if( isRed ) {
-
-      power = -power ;
+      setTargetPowers(power,power,power,power);
 
     }
 
-    for ( int i = 0 ; i < 4 ; i++ ){
-      
-      targetPowers[i] = power;
-      
-    }
+  }
+
+  private void drive ( String direction , double power , double ms ) {
+
+    drive ( direction , power );
+
+    activeSleep(ms);
 
   }
+
   
   private double maxOf ( double[] array ) {
     
-    double maxValue = array[0];
+    double maxValue = Math.abs(array[0]);
     
-    for ( int i = 0 ; i < array.length ; i++ ){
+    for ( int i = 1 ; i < array.length ; i++ ){
+
+      double newValue = Math.abs(array[i]);
       
-      if( array[i] > maxValue ){
+      if( newValue > maxValue ){
         
-        maxValue = array[i];
+        maxValue = newValue;
         
       }
       
@@ -148,9 +158,18 @@ public class OmniFound extends LinearOpMode {
 
   }
 
+  private void setTargetPowers ( double NW , double NE , double SE , double SW ) {
+
+    targetPowers[0] = NW;
+    targetPowers[1] = NE;
+    targetPowers[2] = SE;
+    targetPowers[3] = SW;
+
+  }
+
   private void updateMotors () {
 
-    double orientationAdjustment = ( targetOrientation - orientation ) / 30;
+    double orientationAdjustment = ( targetOrientation - orientation ) / 60;
 
     for ( int i = 0 ; i < 4 ; i++ ){
       
@@ -162,7 +181,7 @@ public class OmniFound extends LinearOpMode {
 
     for ( int i = 0 ; i < 4 ; i++ ){
 
-      normalizedPowers[i] = targetPowers[i]/max;
+      normalizedPowers[i] = adjustedPowers[i]/max;
 
     }
 
@@ -190,8 +209,7 @@ public class OmniFound extends LinearOpMode {
 
   private void updateSensors () {
 
-    stoneBrightness  = sensorStoneBrightness.red() + sensorStoneBrightness.green() + sensorStoneBrightness.blue();
-    ambientBrightness  = sensorAmbientBrightness.red() + sensorAmbientBrightness.green() + sensorAmbientBrightness.blue();
+    isSkystone  = sensorColor.red() + sensorColor.green() < 4 * sensorColor.blue();
     distance    = sensorDistance.getDistance(DistanceUnit.INCH);
     orientation = (int) imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
 
@@ -208,16 +226,16 @@ public class OmniFound extends LinearOpMode {
       distance
     );
     telemetry.addData(
-      "stone brightness",
-      stoneBrightness
+      "yellow",
+      sensorColor.red() + sensorColor.green()
     );
     telemetry.addData(
-      "relative brightness",
-      stoneBrightness/ambientBrightness
+      "blue",
+      sensorColor.blue()*4
     );
     telemetry.addData(
-      "orientation",
-      orientation
+            "orientation",
+            orientation
     );
     telemetry.addData(
       "time",
@@ -227,17 +245,9 @@ public class OmniFound extends LinearOpMode {
 
   }
 
-  private void retime () {
-
-    runtime.reset();
-
-  }
-
   private void activeSleep (double ms) {
 
-    retime();
-
-    while (runtime.seconds() < ms/1000) {
+    while (runtime.seconds() < ms / 1000 && robotIsNotGoingToDestroyUsAll()) {
 
       updateSensors();
       updateMotors();
@@ -246,11 +256,14 @@ public class OmniFound extends LinearOpMode {
 
   }
 
-  private void pause () {
+  private void setTask ( String newTask ) {
 
-    driveX(0);
-    sleep(150);
-    retime();
+    task = newTask;
+    for ( int i = 0 ; i < 4 ; i++ ) {
+      motors[i].setPower(0);
+    }
+    sleep(1000);
+    runtime.reset();
 
   }
 
@@ -268,8 +281,8 @@ public class OmniFound extends LinearOpMode {
 
     sensorLDistance = hardwareMap.get ( DistanceSensor.class ,"sensorL" );
     sensorRDistance = hardwareMap.get ( DistanceSensor.class ,"sensorR" );
-    sensorLBrightness = hardwareMap.get ( ColorSensor.class ,"sensorL" );
-    sensorRBrightness = hardwareMap.get ( ColorSensor.class ,"sensorR" );
+    sensorLColor = hardwareMap.get ( ColorSensor.class ,"sensorL" );
+    sensorRColor = hardwareMap.get ( ColorSensor.class ,"sensorR" );
 
     BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
     parameters.angleUnit            = BNO055IMU.AngleUnit.DEGREES;
@@ -284,8 +297,13 @@ public class OmniFound extends LinearOpMode {
     isRed = sensorRDistance.getDistance(DistanceUnit.INCH) < sensorLDistance.getDistance(DistanceUnit.INCH);
 
     sensorDistance = isRed ? sensorLDistance : sensorRDistance;
-    sensorAmbientBrightness = isRed ? sensorRBrightness : sensorLBrightness;
-    sensorStoneBrightness = isRed ? sensorLBrightness : sensorRBrightness;
+    sensorColor = isRed ? sensorLColor : sensorRColor;
+
+  }
+
+  private boolean robotIsNotGoingToDestroyUsAll () {
+
+    return ( opModeIsActive() && runtime.seconds() < 8 );
 
   }
 
@@ -293,86 +311,63 @@ public class OmniFound extends LinearOpMode {
 
 
 
-    task = "go to stones far";
+    setTask("go to stones far");
 
-    driveX ( 1 );
-
-    activeSleep(700);
+    drive ( "X" , 1 , 1000);
 
     grab(false);
 
+    setTask("go to stones near");
 
+    while ( distance > 2.5 && robotIsNotGoingToDestroyUsAll() ) {
 
-    task = "go to stones near";
-
-    while ( distance < 2.5 ) {
-
-      driveX ( 0.3 );
-
-    }
-
-
-
-    task = "align with wall";
-
-    driveY (-0.5);
-
-    activeSleep(1000);
-
-
-
-    task = "align with 3rd stone";
-
-    driveY ( 0.5 );
-
-    activeSleep(1000);
-
-    task = "find skystone";
-
-
-
-    retime();
-
-    while ( stoneBrightness > (3 * ambientBrightness) && runtime.seconds() < 5) {
-
-      driveY ( 0.3 );
+      drive ( "X" , 0.3 );
+      updateSensors();
+      updateMotors();
 
     }
 
-    pause();
+    setTask("find skystone");
 
+    while ( !isSkystone && robotIsNotGoingToDestroyUsAll() ) {
 
-    task = "go adjacent to stone behind skystone";
+      drive ( "Y" , -0.2);
+      updateSensors();
+      updateMotors();
 
-    driveY ( -0.5 );
+    }
 
-    activeSleep(1000);
+    setTask("go adjacent to stone behind skystone");
 
+    drive ( "Y",-0.5 , 1000);
 
+    setTask("push out stone behind skystone");
 
-    task = "push out stone behind skystone";
+    drive ( "X" ,1 , 1200);
 
-    driveX ( 1 );
+    setTask("move behind skystone");
 
-    activeSleep(1000);
+    drive ( "X" ,-0.5 , 500);
 
+    setTask("go towards skystone");
 
-
-    task = "go towards skystone";
-
-    driveY ( 0.5 );
-
-    activeSleep(2000);
+    drive ( "Y", 0.5 , 500);
 
     grab(true);
 
-
-
-    task = "grab skystone" ;
+    setTask("grab skystone");
 
     activeSleep(2000);
 
-    task = "go to outer ";
+    setTask("go to outer ");
+
+    drive("X",-1,2000);
+
+    setTask("drive to foundation");
+
+    drive("Y",1,3000);
+
+    setTask("end");
 
   }
 
