@@ -209,19 +209,16 @@ public class OmniX extends LinearOpMode {
       driveC   =  ( trigL - trigR ) + 0.1 * ( bumpL - bumpR ) ;
 
 
-      normalize = Math.max ( Math.abs ( driveRht ) + Math.abs ( driveFwd ) + Math.abs ( driveC ) , 1 ) ;
-
-
 
 
 
 
       //driving do
 
-      driveNW.setPower ( (   driveRht + driveFwd + driveC ) / normalize ) ;
-      driveNE.setPower ( (   driveRht - driveFwd + driveC ) / normalize ) ;
-      driveSE.setPower ( ( - driveRht - driveFwd + driveC ) / normalize ) ;
-      driveSW.setPower ( ( - driveRht + driveFwd + driveC ) / normalize ) ;
+      driveNW.setPower (   driveRht + driveFwd + driveC ) ;
+      driveNE.setPower (   driveRht - driveFwd + driveC ) ;
+      driveSE.setPower ( - driveRht - driveFwd + driveC ) ;
+      driveSW.setPower ( - driveRht + driveFwd + driveC ) ;
 
 
 

@@ -55,7 +55,6 @@ public class OmniDepot extends LinearOpMode {
   private DcMotor[] motors = {null,null,null,null};
   double[] targetPowers = {0,0,0,0};
   double[] adjustedPowers = {0,0,0,0};
-  double[] normalizedPowers = {0,0,0,0};
 
   double distance       = 0 ;
 
@@ -65,35 +64,35 @@ public class OmniDepot extends LinearOpMode {
 
   private void drive ( String direction , double power ) {
 
-    if ( direction == "X" ) {
+    if (direction == "X") {
 
       // drive away from drivers
 
-      if ( isRed ) {
+      if (isRed) {
 
-        power = -power ;
+        power = -power;
 
       }
 
-      setTargetPowers(-power,-power,power,power);
+      setTargetPowers(-power, -power, power, power);
 
-    } else if ( direction == "Y" ) {
+    } else if (direction == "Y") {
 
       // drive toward stones
 
-      setTargetPowers(-power,power,power,-power);
+      setTargetPowers(-power, power, power, -power);
 
-    } else if ( direction == "Spin" ) {
+    } else if (direction == "Spin") {
 
       // spin clockwise red , cc blue
 
-      if( isRed ) {
+      if (isRed) {
 
-        power = -power ;
+        power = -power;
 
       }
 
-      setTargetPowers(power,power,power,power);
+      setTargetPowers(power, power, power, power);
 
     }
 
@@ -148,38 +147,23 @@ public class OmniDepot extends LinearOpMode {
     double orientationAdjustment = ( targetOrientation - orientation ) / 60;
 
     for ( int i = 0 ; i < 4 ; i++ ){
-      
+
       adjustedPowers[i] = targetPowers[i] + orientationAdjustment;
-      
-    }
-
-    double max = maxOf(adjustedPowers);
-
-    for ( int i = 0 ; i < 4 ; i++ ){
-
-      normalizedPowers[i] = adjustedPowers[i]/max;
 
     }
 
     for ( int i = 0 ; i < 4 ; i++ ){
 
-      motors[i].setPower(normalizedPowers[i]);
-      
+      motors[i].setPower(adjustedPowers[i]);
+
     }
-    
+
   }
+
 
   private void grab ( boolean shouldGrab ) {
 
-    if ( shouldGrab ) {
-
-      grabber.setPosition ( 0 ) ;
-
-    } else {
-
-      grabber.setPosition ( 1 ) ;
-
-    }
+    grabber.setPosition ( shouldGrab ? 0 : 1 );
 
   }
 
@@ -238,7 +222,7 @@ public class OmniDepot extends LinearOpMode {
     for ( int i = 0 ; i < 4 ; i++ ) {
       motors[i].setPower(0);
     }
-    sleep(1000);
+    sleep(100);
     runtime.reset();
 
   }
@@ -275,6 +259,12 @@ public class OmniDepot extends LinearOpMode {
     sensorDistance = isRed ? sensorLDistance : sensorRDistance;
     sensorColor = isRed ? sensorLColor : sensorRColor;
 
+    telemetry.addData(
+            "team",
+            isRed ? "red" : "blue"
+    );
+    telemetry.update();
+
   }
 
   private boolean robotIsNotGoingToDestroyUsAll () {
@@ -293,7 +283,7 @@ public class OmniDepot extends LinearOpMode {
 
     setTask("go to stones near");
 
-    while ( distance > 2.5 && robotIsNotGoingToDestroyUsAll() ) {
+    while ( distance > 1.8 && robotIsNotGoingToDestroyUsAll() ) {
 
       drive ( "X" , 0.3 );
       updateSensors();
@@ -313,7 +303,7 @@ public class OmniDepot extends LinearOpMode {
 
     setTask("go adjacent to stone behind skystone");
 
-    drive ( "Y",-0.5 , 1000);
+    drive ( "Y",-0.5 , 800);
 
     setTask("push out stone behind skystone");
 
@@ -321,29 +311,35 @@ public class OmniDepot extends LinearOpMode {
 
     setTask("move behind skystone");
 
-    drive ( "X" ,-0.5 , 500);
+    drive ( "X" ,-0.5 , 650);
 
     setTask("go towards skystone");
 
     drive ( "Y", 0.5 , 500);
 
-    grab(true);
-
     setTask("grab skystone");
 
-    drive("0",0,2000);
+    grab(true);
+
+    sleep(2000);
 
     setTask("go to inner");
 
-    drive("X",-1,1000);
+    drive("X",-1,800);
 
     setTask("drive to foundation");
 
     drive("Y",1,3000);
 
+    setTask("release stone");
+
     grab(false);
 
-    drive("Y",-1,500);
+    sleep(2000);
+
+    setTask("park under the bridge");
+
+    drive("Y",-1,1500);
 
     setTask("end");
 

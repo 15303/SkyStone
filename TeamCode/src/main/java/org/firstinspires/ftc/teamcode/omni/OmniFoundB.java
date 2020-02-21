@@ -302,13 +302,15 @@ public class OmniFoundB extends LinearOpMode {
 
     setTask("turn");
 
-    orientation = -90;
+    drive("X", -1, 400);
 
-    drive("Spin",1,2000);
+    targetOrientation = 90;
+
+    drive("Spin",1,2500);
 
     drag(false);
 
-    drive("Spin",1,2000);
+    setTask("drive under bridge");
 
     drive("Y",1,2000);
 
