@@ -18,341 +18,275 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous (
 
-  name  = "OmniDepot"         ,
+  name= "OmniDepot" ,
   group = "2"
 
 )
 
 public class OmniDepot extends LinearOpMode {
-
-
-  boolean isRed = true;
-  boolean isSkystone = false;
+  
+  boolean is_red = true;
+  boolean is_skystone = false;
   
   private ElapsedTime runtime = new ElapsedTime() ;
-
-  private Servo   grabber = null ;
-  private Servo   dragger = null ;
+  
+  private Servo grabber = null ;
+  private Servo dragger = null ;
   private DcMotor slider = null;
-
-  private DistanceSensor sensorRDistance = null;
-  private DistanceSensor sensorLDistance = null;
-  private DistanceSensor sensorDistance = null;
-  private ColorSensor sensorRColor = null;
-  private ColorSensor sensorLColor = null;
-  private ColorSensor sensorColor = null;
-
-  String task =  "initialize";
-
+  
+  private DistanceSensor sensor_proximity_east = null;
+  private DistanceSensor sensor_proximity_west = null;
+  private DistanceSensor sensor_distance_south = null;
+  private ColorSensor sensor_color_east = null;
+  private ColorSensor sensor_color_west = null;
+  
+  String task ="initialize";
+  
   BNO055IMU imu;
-
-  String[] motorNames = {
-          "driveNW",
-          "driveNE",
-          "driveSE",
-          "driveSW"
+  
+  String[] motor_names = {
+    "driveNW",
+    "driveNE",
+    "driveSE",
+    "driveSW"
   };
+  
   private DcMotor[] motors = {null,null,null,null};
-  double[] targetPowers = {0,0,0,0};
-  double[] adjustedPowers = {0,0,0,0};
-
-  double distance       = 0 ;
-
-  double targetOrientation = 0;
-
-  double orientation       = 0 ;
-
+  double[] target_powers = {0,0,0,0};
+  double[] adjusted_powers = {0,0,0,0};
+  
+  double proximity_stone = 0 ;
+  double distance_south = 0 ;
+  double distance_first_skystone = 0;
+  double distance_second_skystone = 0;
+  
+  double target_orientation = 0;
+  
+  double orientation = 0 ;
+  
   private void drive ( String direction , double power ) {
-
-    if (direction == "X") {
-
-      // drive away from drivers
-
-      if (isRed) {
-
-        power = -power;
-
-      }
-
-      setTargetPowers(-power, -power, power, power);
-
-    } else if (direction == "Y") {
-
-      // drive toward stones
-
-      setTargetPowers(-power, power, power, -power);
-
-    } else if (direction == "Spin") {
-
-      // spin clockwise red , cc blue
-
-      if (isRed) {
-
-        power = -power;
-
-      }
-
-      setTargetPowers(power, power, power, power);
-
-    }
-
-  }
-
-  private void drive ( String direction , double power , double ms ) {
-
-    drive ( direction , power );
-
-    activeSleep(ms);
-
+  
+  if (direction == "X") {
+  
+  // drive away from drivers
+  
+  if (is_red) {
+  
+  power = -power;
+  
   }
   
-  private double maxOf ( double[] array ) {
-    
-    double maxValue = 1;
-    
-    for ( int i = 0 ; i < array.length ; i++ ){
-
-      double newValue = Math.abs(array[i]);
-      
-      if( newValue > maxValue ){
-        
-        maxValue = newValue;
-        
-      }
-      
-    }
-    
-    return maxValue;
-    
+  set_target_powers(-power, -power, power, power);
+  
+  } else if (direction == "Y") {
+  
+  // drive toward stones
+  
+  set_target_powers(-power, power, power, -power);
+  
+  } else if (direction == "Spin") {
+  
+  // spin clockwise red , cc blue
+  
+  if (is_red) {
+  
+  power = -power;
+  
   }
-
-
+  
+  set_target_powers(power, power, power, power);
+  
+  }
+  
+  }
+  
+  private void drive ( String direction , double power , double ms ) {
+    drive ( direction , power );
+    active_sleep(ms);
+  }
+  
   private void lift ( double power ) {
-
-    slider.setPower  (  power ) ;
-
+    slider.setPower( power ) ;
   }
-
-  private void setTargetPowers ( double NW , double NE , double SE , double SW ) {
-
-    targetPowers[0] = NW;
-    targetPowers[1] = NE;
-    targetPowers[2] = SE;
-    targetPowers[3] = SW;
-
+  
+  private void set_target_powers ( double NW , double NE , double SE , double SW ) {
+    target_powers[0] = NW;
+    target_powers[1] = NE;
+    target_powers[2] = SE;
+    target_powers[3] = SW;
   }
-
-  private void updateMotors () {
-
-    double orientationAdjustment = ( targetOrientation - orientation ) / 60;
-
+  
+  private void update_motors () {
+    double orientationAdjustment = ( target_orientation - orientation ) / 60;
     for ( int i = 0 ; i < 4 ; i++ ){
-
-      adjustedPowers[i] = targetPowers[i] + orientationAdjustment;
-
+      adjusted_powers[i] = target_powers[i] + orientationAdjustment;
     }
-
+    
     for ( int i = 0 ; i < 4 ; i++ ){
-
-      motors[i].setPower(adjustedPowers[i]);
-
+      motors[i].setPower(adjusted_powers[i]);
     }
-
   }
-
-
-  private void grab ( boolean shouldGrab ) {
-
-    grabber.setPosition ( shouldGrab ? 0 : 1 );
-
+  private void grab ( boolean should_grab ) {
+    grabber.setPosition ( should_grab ? 0 : 0.5 );
   }
-
-  private void updateSensors () {
-
-    isSkystone  = sensorColor.red() + sensorColor.green() < 4 * sensorColor.blue();
-    distance    = sensorDistance.getDistance(DistanceUnit.INCH);
+  
+  private boolean check_skystone ( ColorSensor color_sensor ) {
+    return color_sensor.red() + color_sensor.green() < 4 * color_sensor.blue();
+  }
+  
+  private double get_distance ( DistanceSensor distance_sensor ) {
+    return distance_sensor.getDistance(DistanceUnit.INCH);
+  }
+  
+  private void update_sensors () {
+    is_skystone = check_skystone ( is_red ? sensor_color_west : sensor_color_east);
+    proximity_stone = get_distance ( is_red ? sensor_proximity_west : sensor_proximity_east);
+    distance_south = get_distance( sensor_distance_south );
     orientation = (int) imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
-
     telemetry.addData(
       "team",
-      isRed ? "red" : "blue"
+      is_red ? "red" : "blue"
     );
     telemetry.addData(
       "current task",
       task
     );
     telemetry.addData(
-      "distance",
-      distance
+      "stone proximity",
+      proximity_stone
     );
     telemetry.addData(
-      "yellow",
-      sensorColor.red() + sensorColor.green()
+      "south distance",
+      proximity_stone
     );
     telemetry.addData(
-      "blue",
-      sensorColor.blue()*4
-    );
-    telemetry.addData(
-            "orientation",
-            orientation
+      "orientation",
+      orientation
     );
     telemetry.addData(
       "time",
       runtime.seconds()
     );
     telemetry.update();
-
   }
-
-  private void activeSleep (double ms) {
-
-    while (runtime.seconds() < ms / 1000 && robotIsNotGoingToDestroyUsAll()) {
-
-      updateSensors();
-      updateMotors();
-
+  private void active_sleep (double ms) {
+    while (runtime.seconds() < ms / 1000 && robot_is_not_going_to_destroy_us_all()) {
+      update_sensors();
+      update_motors();
     }
-
   }
-
-  private void setTask ( String newTask ) {
-
+  private void set_task ( String newTask ) {
     task = newTask;
     for ( int i = 0 ; i < 4 ; i++ ) {
       motors[i].setPower(0);
     }
     sleep(100);
     runtime.reset();
-
   }
-
   private void initialize () {
 
     for ( int i = 0 ; i < 4 ; i++ ){
-
-      motors[i] = hardwareMap.get ( DcMotor.class , motorNames[i] ) ;
-
+      motors[i] = hardwareMap.get ( DcMotor.class , motor_names[i] ) ;
     }
 
-    slider     = hardwareMap.get ( DcMotor.class , "slider"  ) ;
-    grabber    = hardwareMap.get ( Servo.class   , "grabber" ) ;
-    dragger    = hardwareMap.get ( Servo.class   , "dragger" ) ;
+    slider = hardwareMap.get ( DcMotor.class , "slider") ;
+    grabber = hardwareMap.get ( Servo.class , "grabber" ) ;
+    dragger = hardwareMap.get ( Servo.class , "dragger" ) ;
 
-    sensorLDistance = hardwareMap.get ( DistanceSensor.class ,"sensorL" );
-    sensorRDistance = hardwareMap.get ( DistanceSensor.class ,"sensorR" );
-    sensorLColor = hardwareMap.get ( ColorSensor.class ,"sensorL" );
-    sensorRColor = hardwareMap.get ( ColorSensor.class ,"sensorR" );
+    sensor_proximity_west = hardwareMap.get ( DistanceSensor.class ,"sensorW" );
+    sensor_proximity_east = hardwareMap.get ( DistanceSensor.class ,"sensorE" );
 
+    sensor_distance_south = hardwareMap.get ( DistanceSensor.class ,"sensorS" );
+
+    sensor_color_west = hardwareMap.get ( ColorSensor.class,"sensorW" );
+    sensor_color_east = hardwareMap.get ( ColorSensor.class,"sensorE" );
+    
     BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-    parameters.angleUnit            = BNO055IMU.AngleUnit.DEGREES;
-    parameters.accelUnit            = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-    parameters.loggingEnabled       = true;
-    parameters.loggingTag           = "IMU";
+    parameters.angleUnit= BNO055IMU.AngleUnit.DEGREES;
+    parameters.accelUnit= BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+    parameters.loggingEnabled = true;
+    parameters.loggingTag = "IMU";
     parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
 
     imu = hardwareMap.get(BNO055IMU.class, "imu");
     imu.initialize(parameters);
 
-    isRed = sensorRDistance.getDistance(DistanceUnit.INCH) < sensorLDistance.getDistance(DistanceUnit.INCH);
-
-    sensorDistance = isRed ? sensorLDistance : sensorRDistance;
-    sensorColor = isRed ? sensorLColor : sensorRColor;
+    is_red = get_distance ( sensor_proximity_west ) > get_distance ( sensor_proximity_east ) ;
 
     telemetry.addData(
-            "team",
-            isRed ? "red" : "blue"
+      "team",
+      is_red ? "red" : "blue"
     );
     telemetry.update();
-
   }
-
-  private boolean robotIsNotGoingToDestroyUsAll () {
-
+  private boolean robot_is_not_going_to_destroy_us_all () {
     return ( opModeIsActive() && runtime.seconds() < 8 );
-
   }
-
   private void run () {
 
-    setTask("go to stones far");
-
+    set_task("go to stones far");
     drive ( "X" , 1 , 1000);
-
     grab(false);
 
-    setTask("go to stones near");
-
-    while ( distance > 1.8 && robotIsNotGoingToDestroyUsAll() ) {
-
+    set_task("go to stones near");
+    while ( proximity_stone > 1.8 && robot_is_not_going_to_destroy_us_all() ) {
       drive ( "X" , 0.3 );
-      updateSensors();
-      updateMotors();
+      update_sensors();
+      update_motors();
+    }
+  
+    set_task("find first skystone");
+    while ( !is_skystone && robot_is_not_going_to_destroy_us_all() ) {
+      drive ( "Y" , -0.5);
+      update_sensors();
+      update_motors();
+    }
+    distance_first_skystone = distance_south;
+    distance_second_skystone = distance_first_skystone - 12;
 
+    set_task("align latitude with first skystone");
+    drive("Y",-1,200);
+
+    set_task("align longitude with first skystone");
+    drive("X",1,600);
+    
+    set_task("grab first skystone");
+    grab(true);
+    sleep(2000);
+
+    set_task("go to inner");
+    drive("X",-1,900);
+    
+    set_task("drive to foundation");
+    drive("Y",1,2000);
+    
+    set_task("release first skystone");
+    grab(false);
+
+    set_task("align latitude with second skystone");
+    drive("Y",-1,2000);
+    while ( distance_south > distance_second_skystone && robot_is_not_going_to_destroy_us_all() ) {
+      drive("Y",-1);
     }
 
-    setTask("find skystone");
-
-    while ( !isSkystone && robotIsNotGoingToDestroyUsAll() ) {
-
-      drive ( "Y" , -0.2);
-      updateSensors();
-      updateMotors();
-
+    set_task("go to second skystone");
+    while ( proximity_stone > 1.8 && robot_is_not_going_to_destroy_us_all() ) {
+      drive("X",0.3);
     }
 
-    setTask("go adjacent to stone behind skystone");
-
-    drive ( "Y",-0.5 , 800);
-
-    setTask("push out stone behind skystone");
-
-    drive ( "X" ,1 , 1200);
-
-    setTask("move behind skystone");
-
-    drive ( "X" ,-0.5 , 650);
-
-    setTask("go towards skystone");
-
-    drive ( "Y", 0.5 , 500);
-
-    setTask("grab skystone");
-
+    set_task("grab second skystone");
     grab(true);
 
-    sleep(2000);
-
-    setTask("go to inner");
-
-    drive("X",-1,800);
-
-    setTask("drive to foundation");
-
-    drive("Y",1,3000);
-
-    setTask("release stone");
-
-    grab(false);
-
-    sleep(2000);
-
-    setTask("park under the bridge");
-
+    set_task("park under the bridge");
     drive("Y",-1,1500);
-
-    setTask("end");
-
+    set_task("end");
+  
   }
-
+  
   @Override
   public void runOpMode () {
-
     initialize();
-
     waitForStart();
-
     run();
-
   }
 }

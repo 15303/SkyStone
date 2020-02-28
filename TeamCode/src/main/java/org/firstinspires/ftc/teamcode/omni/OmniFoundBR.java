@@ -17,15 +17,15 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous (
 
-        name  = "OmniFoundB"         ,
+        name  = "OmniFoundBR"         ,
         group = "2"
 
 )
 
-public class OmniFoundB extends LinearOpMode {
+public class OmniFoundBR extends LinearOpMode {
 
 
-  boolean isRed = false;
+  boolean isRed = true;
   boolean isSkystone = false;
 
   private ElapsedTime runtime = new ElapsedTime() ;
@@ -302,7 +302,7 @@ public class OmniFoundB extends LinearOpMode {
 
     setTask("turn");
 
-    targetOrientation = 90;
+    targetOrientation = -90;
 
     drive("Spin",1,1000);
 
@@ -322,7 +322,7 @@ public class OmniFoundB extends LinearOpMode {
 
     setTask("drive under bridge");
 
-    drive("Y",1,1200);
+    drive("Y",1,1500);
 
     setTask("end");
 

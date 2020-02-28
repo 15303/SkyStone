@@ -176,7 +176,7 @@ public class OmniFoundR extends LinearOpMode {
 
     } else {
 
-      dragger.setPosition ( 0 ) ;
+      dragger.setPosition ( 0.3 ) ;
 
     }
 
@@ -237,7 +237,7 @@ public class OmniFoundR extends LinearOpMode {
     for ( int i = 0 ; i < 4 ; i++ ) {
       motors[i].setPower(0);
     }
-    sleep(1000);
+    sleep(100);
     runtime.reset();
 
   }
@@ -294,25 +294,25 @@ public class OmniFoundR extends LinearOpMode {
 
     drag(true);
 
-    drive("Y",0,1000);
+    drive("Y",0,2000);
 
     setTask("drag foundation to building zone");
 
-    drive("Y",1,2000);
-
-    setTask("turn");
-
-    drive("X", -1, 400);
-
-    targetOrientation = 90;
-
-    drive("Spin",1,2500);
+    drive("Y",1,5000);
 
     drag(false);
 
+    drive("Y",0,2000);
+
+    setTask("turn");
+
+    targetOrientation = -90;
+
+    drive("Spin",1,700);
+
     setTask("drive under bridge");
 
-    drive("Y",1,2000);
+    drive("Y",1,2700);
 
     setTask("end");
 
