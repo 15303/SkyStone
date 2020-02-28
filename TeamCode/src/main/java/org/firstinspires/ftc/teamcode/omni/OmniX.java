@@ -95,14 +95,14 @@ public class OmniX extends LinearOpMode {
 	  left_stick_forward = gamepad1.left_stick_y  + gamepad2.left_stick_y  ;
 	  right_stick_forward = gamepad1.right_stick_y + gamepad2.right_stick_y ;
 
-	  trigger_left   = gamepad1.left_trigger  + gamepad2.left_trigger  ;
-	  trigger_right   = gamepad1.right_trigger + gamepad2.right_trigger ;
-	  bumper_left   = boolean_to_int( gamepad1.left_bumper  ) + boolean_to_int( gamepad2.left_bumper  );
-	  bumper_right   = boolean_to_int( gamepad1.right_bumper ) + boolean_to_int( gamepad2.right_bumper );
+	  trigger_left = gamepad1.left_trigger  + gamepad2.left_trigger  ;
+	  trigger_right = gamepad1.right_trigger + gamepad2.right_trigger ;
+	  bumper_left = boolean_to_int( gamepad1.left_bumper  ) + boolean_to_int( gamepad2.left_bumper  );
+	  bumper_right = boolean_to_int( gamepad1.right_bumper ) + boolean_to_int( gamepad2.right_bumper );
 
-	  drive_forward =   ( Math.pow ( left_stick_forward , 3 ) + Math.pow ( right_stick_forward , 3 ) ) / 2 ;
+	  drive_forward = ( Math.pow ( left_stick_forward , 3 ) + Math.pow ( right_stick_forward , 3 ) ) / 2 ;
 	  drive_right = - ( Math.pow ( left_stick_right , 3 ) + Math.pow ( right_stick_right , 3 ) ) / 2 ;
-	  drive_clockwise   =  ( trigger_left - trigger_right ) + 0.1 * ( bumper_left - bumper_right ) ;
+	  drive_clockwise = ( trigger_left - trigger_right ) + 0.1 * ( bumper_left - bumper_right ) ;
 
 	  slider_power = clamp(
 		-1,
@@ -111,10 +111,10 @@ public class OmniX extends LinearOpMode {
 	  );
 	  if ( dpad_is_pressed && !dpad_was_was_pressed ) {
 		grabber_preset += boolean_to_int(gamepad1.dpad_up || gamepad2.dpad_left) - boolean_to_int(gamepad1.dpad_down || gamepad2.dpad_right);
-		grabber_preset = clamp(0, grabber_preset, grabber_presets.length - 1);
+		grabber_preset = clamp(0, grabber_preset, grabber_presets.length - 1 );
 	  }
-	  dpad_was_pressed = dpad_is_pressed;
 	  dpad_was_was_pressed = dpad_was_pressed;
+    dpad_was_pressed = dpad_is_pressed;
 
 	  driveNW.setPower (   drive_right + drive_forward + drive_clockwise ) ;
 	  driveNE.setPower (   drive_right - drive_forward + drive_clockwise ) ;
@@ -122,13 +122,13 @@ public class OmniX extends LinearOpMode {
 	  driveSW.setPower ( - drive_right + drive_forward + drive_clockwise ) ;
 
 	  slider.setPower ( slider_power ) ;
-	  grabber.setPosition ( grabber_presets [ grabber_preset ]  ) ;
+	  grabber.setPosition ( grabber_presets [ grabber_preset ] ) ;
 
 	  if( gamepad1.y||gamepad2.y||gamepad1.a||gamepad2.a ){
         dragger.setPosition ( ( gamepad1.y || gamepad2.y ) ? 0.3 : 1 ) ;
       }
       if( gamepad1.x||gamepad2.x||gamepad1.b||gamepad2.b ) {
-        dropper.setPosition( ( gamepad1.x || gamepad2.x ) ? 0.3 : 1 );
+        dropper.setPosition( ( gamepad1.x || gamepad2.x ) ? 0.4 : 0.7 );
       }
 	  // telemetry
 
