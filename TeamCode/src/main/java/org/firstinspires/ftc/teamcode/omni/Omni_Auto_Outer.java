@@ -15,9 +15,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous ( name= "Omni Auto Depot" )
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous ( name= "Omni Auto Inner" )
 
-public class Omni_Auto_Depot extends LinearOpMode {
+public class Omni_Auto_Inner extends LinearOpMode {
 
   boolean is_red = true;
   boolean is_skystone = false;
@@ -194,7 +194,7 @@ public class Omni_Auto_Depot extends LinearOpMode {
     imu = hardwareMap.get(BNO055IMU.class, "imu");
     imu.initialize(parameters);
 
-    is_red = get_distance ( sensor_distance_sw ) > get_distance ( sensor_distance_se ) ;
+    is_red = get_distance ( sensor_distance_sw ) < get_distance ( sensor_distance_se ) ;
 
     telemetry.addData(
             "team",
@@ -205,65 +205,13 @@ public class Omni_Auto_Depot extends LinearOpMode {
   private boolean robot_is_not_going_to_destroy_us_all () {
     return ( opModeIsActive() && runtime.seconds() < 5 );
   }
-  private void find_skystone(){
-
-    grab(false);
-    set_task("go near the depot");
-    while( distance_station_wall < 25 && robot_is_not_going_to_destroy_us_all() ) {
-      drive ( "X" , 1 );
-    }
-
-    set_task("go next to depot");
-    while ( distance_stone > 1.8 && distance_station_wall < 50 && robot_is_not_going_to_destroy_us_all() ) {
-      drive ( "X" , 0.3 );
-    }
-
-    set_task("find skystone");
-    while ( !is_skystone && distance_south_wall > 5 && robot_is_not_going_to_destroy_us_all() ) {
-      drive ( "Y" , -0.5);
-    }
-
-    distance_south_wall_to_second_skystone = distance_south_wall - 16 ;
-
-    set_task("align latitude with skystone");
-    drive("Y",-1,100);
-
-    set_task("grab skystone");
-    grab(true);
-    drive("X",1,800);
-
-    set_task("go to inner lane");
-    while ( distance_station_wall > 27 && robot_is_not_going_to_destroy_us_all() ) {
-      drive ( "X" , -1);
-    }
-
-    set_task("go under bridge");
-    while ( distance_south_wall < 70 && robot_is_not_going_to_destroy_us_all() ) {
-      drive("Y",1);
-    }
-
-    set_task("go to foundation");
-    drive("Y",1,2000);
-
-    grab(false);
-    set_task("go under bridge");
-    drive( "Y" , -1 , 1000);
-    grab(true);
-
-  }
   private void run () {
 
-    find_skystone();
-
-    set_task("go back to depot");
-    while( distance_south_wall > distance_south_wall_to_second_skystone && robot_is_not_going_to_destroy_us_all() ){
-      drive("Y",-1 );
-    }
-
-    find_skystone();
-
+		set_task("go to outer");
+		drive("X",1,1000);
+		
     set_task("park under bridge");
-    drive("Y",-1,1500);
+    drive("Y",1,1000);
     
     set_task("end");
 
