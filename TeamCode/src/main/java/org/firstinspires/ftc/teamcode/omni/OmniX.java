@@ -72,8 +72,8 @@ public class OmniX extends LinearOpMode {
 
 	slider  = hardwareMap.get ( DcMotor.class , "slider"  ) ;
 	grabber = hardwareMap.get ( Servo.class   , "grabber" ) ;
-      dragger = hardwareMap.get ( Servo.class   , "dragger" ) ;
-      dropper = hardwareMap.get ( Servo.class   , "dropper" ) ;
+  dragger = hardwareMap.get ( Servo.class   , "dragger" ) ;
+  dropper = hardwareMap.get ( Servo.class   , "dropper" ) ;
 
 	waitForStart ( ) ;
 	telemetry.addData ( "Status" , "OmniX Active" ) ;
@@ -81,10 +81,10 @@ public class OmniX extends LinearOpMode {
 	while ( opModeIsActive () ) {
 
 	  dpad_is_pressed = (
-		gamepad1.dpad_up || gamepad1.dpad_down
-	 || gamepad1.dpad_left || gamepad1.dpad_right
-	 || gamepad2.dpad_up || gamepad2.dpad_down
-	 || gamepad2.dpad_left || gamepad2.dpad_right
+      gamepad1.dpad_up || gamepad1.dpad_down
+   || gamepad1.dpad_left || gamepad1.dpad_right
+   || gamepad2.dpad_up || gamepad2.dpad_down
+   || gamepad2.dpad_left || gamepad2.dpad_right
 	  );
 
 	  //driving define
@@ -105,14 +105,16 @@ public class OmniX extends LinearOpMode {
 	  drive_clockwise = ( trigger_left - trigger_right ) + 0.1 * ( bumper_left - bumper_right ) ;
 
 	  slider_power = clamp(
-		-1,
+    -1,
 		boolean_to_int(gamepad1.dpad_left || gamepad2.dpad_down) - boolean_to_int(gamepad1.dpad_right || gamepad2.dpad_up),
 		1
 	  );
+
 	  if ( dpad_is_pressed && !dpad_was_was_pressed ) {
 		grabber_preset += boolean_to_int(gamepad1.dpad_up || gamepad2.dpad_left) - boolean_to_int(gamepad1.dpad_down || gamepad2.dpad_right);
 		grabber_preset = clamp(0, grabber_preset, grabber_presets.length - 1 );
 	  }
+
 	  dpad_was_was_pressed = dpad_was_pressed;
     dpad_was_pressed = dpad_is_pressed;
 
