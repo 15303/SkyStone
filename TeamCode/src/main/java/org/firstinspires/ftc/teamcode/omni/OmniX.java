@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.omni;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
@@ -20,7 +21,7 @@ public class OmniX extends LinearOpMode {
   private DcMotor slider = null;
   private Servo grabber = null;
   private Servo dragger = null;
-  private Servo dropper = null;
+  private CRServo dropper = null;
 
   double left_stick_right = 0 ;
   double right_stick_right = 0 ;
@@ -31,13 +32,6 @@ public class OmniX extends LinearOpMode {
   double bumper_left = 0 ;
   double bumper_right = 0 ;
 
-  double[] grabber_presets = {0.1,0.3,0.6,1};
-  int grabber_preset = 1;
-
-  boolean dpad_was_was_pressed = true;
-  boolean dpad_was_pressed = false;
-  boolean dpad_is_pressed = false;
-
   // minimum throttle for motors to have sufficient grip
 
   double drive_right  = 0 ;
@@ -46,8 +40,9 @@ public class OmniX extends LinearOpMode {
 
   double slider_power = 0   ;
   double grabber_position  = 0.3 ;
-  double dragger_position  = 0 ;
-  
+  double dragger_position  = 0.2 ;
+  double dropper_position  = 0 ;
+
   private int boolean_to_int( boolean bool ){
 	return bool ? 1 : -1;
   }
@@ -73,19 +68,12 @@ public class OmniX extends LinearOpMode {
 	slider  = hardwareMap.get ( DcMotor.class , "slider"  ) ;
 	grabber = hardwareMap.get ( Servo.class   , "grabber" ) ;
   dragger = hardwareMap.get ( Servo.class   , "dragger" ) ;
-  dropper = hardwareMap.get ( Servo.class   , "dropper" ) ;
+  dropper = hardwareMap.get ( CRServo.class   , "dropper" ) ;
 
 	waitForStart ( ) ;
 	telemetry.addData ( "Status" , "OmniX Active" ) ;
 
 	while ( opModeIsActive () ) {
-
-	  dpad_is_pressed = (
-      gamepad1.dpad_up || gamepad1.dpad_down
-   || gamepad1.dpad_left || gamepad1.dpad_right
-   || gamepad2.dpad_up || gamepad2.dpad_down
-   || gamepad2.dpad_left || gamepad2.dpad_right
-	  );
 
 	  //driving define
 
@@ -104,34 +92,28 @@ public class OmniX extends LinearOpMode {
 	  drive_right = - ( Math.pow ( left_stick_right , 3 ) + Math.pow ( right_stick_right , 3 ) ) / 2 ;
 	  drive_clockwise = ( trigger_left - trigger_right ) + 0.1 * ( bumper_left - bumper_right ) ;
 
-	  slider_power = clamp(
-    -1,
-		boolean_to_int(gamepad1.dpad_left || gamepad2.dpad_down) - boolean_to_int(gamepad1.dpad_right || gamepad2.dpad_up),
-		1
-	  );
-
-	  if ( dpad_is_pressed && !dpad_was_was_pressed ) {
-		grabber_preset += boolean_to_int(gamepad1.dpad_up || gamepad2.dpad_left) - boolean_to_int(gamepad1.dpad_down || gamepad2.dpad_right);
-		grabber_preset = clamp(0, grabber_preset, grabber_presets.length - 1 );
-	  }
-
-	  dpad_was_was_pressed = dpad_was_pressed;
-    dpad_was_pressed = dpad_is_pressed;
-
 	  driveNW.setPower (   drive_right + drive_forward + drive_clockwise ) ;
 	  driveNE.setPower (   drive_right - drive_forward + drive_clockwise ) ;
 	  driveSE.setPower ( - drive_right - drive_forward + drive_clockwise ) ;
 	  driveSW.setPower ( - drive_right + drive_forward + drive_clockwise ) ;
 
-	  slider.setPower ( slider_power ) ;
-	  grabber.setPosition ( grabber_presets [ grabber_preset ] ) ;
+	  slider.setPower ( (gamepad1.dpad_left||gamepad2.dpad_up) ? 1 : (gamepad1.dpad_right||gamepad2.dpad_down) ? -1 : 0 ) ;
+    if ( gamepad1.dpad_up || gamepad2.dpad_left ){
+      grabber_position += 0.002;
+    } else if (gamepad1.dpad_down || gamepad2.dpad_right) {
+      grabber_position = 0;
+    }
+    grabber_position = Math.max(0.15,Math.min(grabber_position,0.9));
+    if( gamepad1.y||gamepad2.y||gamepad1.a||gamepad2.a ){
+      dragger_position = ( gamepad1.y || gamepad2.y ) ? 0.2 : 0.85 ;
+    }
+    if( gamepad1.x||gamepad2.x||gamepad1.b||gamepad2.b ) {
+      dropper_position = ( gamepad1.x || gamepad2.x ) ? 0.5 : 0.6 ;
+    }
+    grabber.setPosition(grabber_position);
+    dragger.setPosition(dragger_position);
+    dropper.setPower( (gamepad1.x||gamepad2.x) ? 1 : (gamepad1.b||gamepad2.b) ? -1 : 0);
 
-	  if( gamepad1.y||gamepad2.y||gamepad1.a||gamepad2.a ){
-        dragger.setPosition ( ( gamepad1.y || gamepad2.y ) ? 0.3 : 1 ) ;
-      }
-      if( gamepad1.x||gamepad2.x||gamepad1.b||gamepad2.b ) {
-        dropper.setPosition( ( gamepad1.x || gamepad2.x ) ? 0.4 : 0.7 );
-      }
 	  // telemetry
 
 	  telemetry.addData ( "Status" , "OmniX Running" ) ;

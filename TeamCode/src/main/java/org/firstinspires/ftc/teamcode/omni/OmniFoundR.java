@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.omni;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -14,10 +15,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-
+@Disabled
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous (
 
-        name  = "OmniFoundR"         ,
+        name  = "OmniFoundB"         ,
         group = "2"
 
 )
@@ -25,7 +26,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class OmniFoundR extends LinearOpMode {
 
 
-  boolean isRed = true;
+  boolean isRed = false;
   boolean isSkystone = false;
 
   private ElapsedTime runtime = new ElapsedTime() ;
@@ -184,8 +185,8 @@ public class OmniFoundR extends LinearOpMode {
 
   private void updateSensors () {
 
-    isSkystone  = sensorColor.red() + sensorColor.green() < 4 * sensorColor.blue();
-    distance    = sensorDistance.getDistance(DistanceUnit.INCH);
+//    isSkystone  = sensorColor.red() + sensorColor.green() < 4 * sensorColor.blue();
+//    distance    = sensorDistance.getDistance(DistanceUnit.INCH);
     orientation = (int) imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
 
     telemetry.addData(
@@ -196,18 +197,18 @@ public class OmniFoundR extends LinearOpMode {
             "current task",
             task
     );
-    telemetry.addData(
-            "distance",
-            distance
-    );
-    telemetry.addData(
-            "yellow",
-            sensorColor.red() + sensorColor.green()
-    );
-    telemetry.addData(
-            "blue",
-            sensorColor.blue()*4
-    );
+//    telemetry.addData(
+//            "distance",
+//            distance
+//    );
+//    telemetry.addData(
+//            "yellow",
+//            sensorColor.red() + sensorColor.green()
+//    );
+//    telemetry.addData(
+//            "blue",
+//            sensorColor.blue()*4
+//    );
     telemetry.addData(
             "orientation",
             orientation
@@ -254,10 +255,10 @@ public class OmniFoundR extends LinearOpMode {
     grabber    = hardwareMap.get ( Servo.class   , "grabber" ) ;
     dragger    = hardwareMap.get ( Servo.class   , "dragger" ) ;
 
-    sensorLDistance = hardwareMap.get ( DistanceSensor.class ,"sensorL" );
-    sensorRDistance = hardwareMap.get ( DistanceSensor.class ,"sensorR" );
-    sensorLColor = hardwareMap.get ( ColorSensor.class ,"sensorL" );
-    sensorRColor = hardwareMap.get ( ColorSensor.class ,"sensorR" );
+//    sensorLDistance = hardwareMap.get ( DistanceSensor.class ,"sensorL" );
+//    sensorRDistance = hardwareMap.get ( DistanceSensor.class ,"sensorR" );
+//    sensorLColor = hardwareMap.get ( ColorSensor.class ,"sensorL" );
+//    sensorRColor = hardwareMap.get ( ColorSensor.class ,"sensorR" );
 
     BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
     parameters.angleUnit            = BNO055IMU.AngleUnit.DEGREES;

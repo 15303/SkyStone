@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -51,7 +52,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="blue stone out", group="r1")
-//@Disabled
+@Disabled
 public class R1_blue_stone_out extends LinearOpMode {
 
     // Declare OpMode members.
